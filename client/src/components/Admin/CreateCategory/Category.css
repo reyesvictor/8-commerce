@@ -1,0 +1,29 @@
+.container {
+    font-size: 20px;
+}
+
+#formCategory {
+    padding: 10%;
+}
+
+.btnLink {
+    padding-top: 20px;
+    text-align: center;
+}
+
+.margin-right {
+    margin-right: 30%;
+}
+
+.btn-warning {
+    width: 25%;
+}
+
+.errorInput {
+    border: solid 1px red !important;
+}
+
+.errorInput:focus {
+    outline: none !important;
+    box-shadow: 0 0 0px 1px rgb(0, 0, 0) !important;
+}

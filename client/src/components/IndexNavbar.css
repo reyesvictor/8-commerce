@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css?family=Material+Icons');
+
+
+#productsCart div {
+    color: black;
+    margin-top: 0.7vh;
+    margin-left: 1vw;
+}
+
+#productsCart:link {
+    color: black;
+}
+
+#adminLogo img,
+#profileLogo img,
+#searchLogo img {
+    width: 60%;
+    margin: 0;
+    padding: 0;
+}
+
+#adminLogo {
+    margin: 0;
+    padding: 0;
+}
+#searchLogo {
+    padding: 0.5vh;
+}
+
+#brandName {
+    color: black;
+}
+
+#underline {
+    display: flex;
+}
+
+#underline a:last-child {
+    margin-left: auto;
+}
+
+.searchcontainer {
+    margin-right: 1vw;
+}
+
+@media (min-width: 992px) {
+    #navbarholder {
+        display: flex;
+        justify-content: space-between
+    }
+}
+
+@media (max-width: 574px) {
+    .searchcontainer { 
+        width: 40vw!important;
+    }
+    .searchcontainer input {
+        width: 80%;
+    }
+    #productsCart {
+        width: auto!important;
+    }
+}
+
+
+@media (max-width: 524px) {
+    .searchcontainer { 
+        width: 60vw!important;
+    }
+    .searchcontainer input {
+        width: 80%;
+    }
+    #productsCart {
+        width: auto!important;
+    }
+}
