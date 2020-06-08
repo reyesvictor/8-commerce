@@ -27,11 +27,15 @@ export default class SearchSidebar extends Component {
       size: [],
       color: [],
       subcategory: null,
+      category: null,
       orderBy: "Popularity",
       sortBy: "desc",
 
       subcategories: null,
       isSubCategoryReady: false,
+
+      categories: null,
+      isCategoryReady: false,
 
       colors: null,
       isColorsReady: false,
@@ -50,6 +54,7 @@ export default class SearchSidebar extends Component {
     this.handleSize = this.handleSize.bind(this);
     this.handleColor = this.handleColor.bind(this);
     this.handleSubCategory = this.handleSubCategory.bind(this);
+    this.handleCategory = this.handleCategory.bind(this);
     this.handleOrderBy = this.handleOrderBy.bind(this);
     this.handleSortBy = this.handleSortBy.bind(this);
     this.showFilter = this.showFilter.bind(this);
@@ -114,6 +119,29 @@ export default class SearchSidebar extends Component {
     this.setState({ subcategory: e.target.value });
   }
 
+  handleCategory(e) {
+    e.preventDefault();
+
+    console.log(e.target.value);
+    this.setState({ category: e.target.value });
+
+    axios
+      .get("http://localhost:8000/api/category/")
+      .then(async (res) => {
+        console.log(res.data.data);
+        await this.setState({ categories: res.data.data, isCategoryReady: true, isResultsReady: false });
+
+        res.data.data.map(cat => {
+          if ( this.state.category == cat.name ) {
+            this.setState({ subcategories: cat.subCategories, isCategoryReady: true });
+          }
+        })
+      })
+      .catch((error) => {
+        console.log(error.response);
+      });
+  }
+
   async handleOrderBy(e) {
     await this.setState({ orderBy: e.target.text });
     if (!this.state.showFilter) {
@@ -168,6 +196,7 @@ export default class SearchSidebar extends Component {
       size: this.checkEmptyArray(this.state.size),
       color: this.checkEmptyArray(this.state.color),
       subcategory: this.state.subcategory,
+      category: this.state.category,
       order_by: this.state.orderBy.toLowerCase(),
       order_by_sort: this.state.sortBy,
       search: this.state.searchValue
@@ -202,11 +231,32 @@ export default class SearchSidebar extends Component {
   }
 
   componentDidMount() {
+    let paramsURL = this.props.location.search.substr(1).split("=")
+
+    if (paramsURL[0] == "subcategory") {
+      this.defaultValueSubCategory(paramsURL[1])
+      // $('select option[value="null"]').prop('selected',false);
+      console.log(paramsURL[1])
+    }
+    else if (paramsURL[0] == "category") {
+      this.defaultValueCategory(paramsURL[1])
+    }
+
     axios
       .get("http://localhost:8000/api/subcategory/")
       .then((res) => {
         console.log(res.data);
         this.setState({ subcategories: res.data, isSubCategoryReady: true });
+      })
+      .catch((error) => {
+        console.log(error.response);
+      });
+
+    axios
+      .get("http://localhost:8000/api/category/")
+      .then((res) => {
+        console.log(res.data.data);
+        this.setState({ categories: res.data.data, isCategoryReady: true });
       })
       .catch((error) => {
         console.log(error.response);
@@ -221,14 +271,36 @@ export default class SearchSidebar extends Component {
       .catch((error) => {
         console.log(error.response);
       });
+
+
+      // $('select option:contains("Handbags")').prop('selected',true);
+
+      // $('#sel1 option').filter(function() { 
+      //   return ($(this).val() == 'Handbags');
+      // }).prop('selected', true);
+      
+  }
+
+  async defaultValueSubCategory(value) {
+    await this.setState({ subcategory: value });
+    this.handleSubmit()
+  }
+
+  async defaultValueCategory(value) {
+    await this.setState({ category: value });
+    this.handleSubmit()
   }
 
   render() {
-    const isReady = this.state.isSubCategoryReady && this.state.isColorsReady;
+    const isReady =  this.state.isCategoryReady && this.state.isColorsReady;
+
+    const isSubCategoriesReady = this.state.isSubCategoryReady;
 
     const sortChecked = this.state.sortBy;
 
     const results = this.state.results;
+
+    const subcategoryDefault = this.state.subcategory
 
     return (
       <div className="container">
@@ -424,16 +496,43 @@ export default class SearchSidebar extends Component {
                 <select
                   className=" col-3 form-control"
                   id="sel1"
-                  onChange={this.handleSubCategory}
+                  onChange={this.handleCategory}
                 >
+                  
                   <option defaultValue="null"></option>
 
                   {isReady
-                    ? this.state.subcategories.map((subcategory) => (
-                        <option key={subcategory.id} value={subcategory.id}>
-                          {subcategory.name}
-                        </option>
-                      ))
+                    ? 
+                    this.state.categories.map((category) => (
+                      <option key={category.id} value={category.name} >
+                        {category.name}
+                      </option>
+                    ))                    
+                    : null}
+                </select>
+              </div>
+
+              {/* Subcategory */}
+              <div className="form-group row">
+                <label htmlFor="sel1 col-2">
+                  <span className="mr-5">Subcategory</span>
+                </label>
+
+                <select
+                  className=" col-3 form-control"
+                  id="sel1"
+                  onChange={this.handleSubCategory}
+                >
+
+                  <option defaultValue="null"></option>
+
+                  {isSubCategoriesReady
+                    ? 
+                    this.state.subcategories.map((subcategory) => (
+                      <option key={subcategory.id} value={subcategory.name} >
+                        {subcategory.name}
+                      </option>
+                    ))                    
                     : null}
                 </select>
               </div>

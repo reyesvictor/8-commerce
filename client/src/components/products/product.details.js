@@ -3,6 +3,8 @@ import $ from 'jquery';
 import axios from 'axios';
 import { useRouteMatch } from "react-router-dom";
 import ReactImageMagnify from 'react-image-magnify';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function ProductDescription() {
     const [product, setProduct] = useState([]);
@@ -177,8 +179,8 @@ function ProductDescription() {
 
     const subproductsAvailable = () => {
 
-        let pathCat = "/" + Categoryname;
-        let pathSub = "/" + subCategory;
+        let pathCat = "/search?category=" + Categoryname;
+        let pathSub = "/search?subcategory=" + subCategory;
 
         return (
             <div className="divDetails">
@@ -209,9 +211,42 @@ function ProductDescription() {
                     </>
                     : null
                 }
-               {product.status == true ?  <button className='btn-cart'>Add to cart</button> :  <button className='btn-cart'>Out of stock</button>}
+               {product.status == true ?  <button onClick={addCart} className='btn-cart'>Add to cart</button> :  <button className='btn-cart'>Out of stock</button>}
             </div>
         )
+    }
+    
+    const addCart = () => { 
+        // [{"productid":2,"quantite":1},{"productid":3,"quantite":5}]
+        let panier = sessionStorage.getItem('panier', []);
+        
+        if (chosenSubProduct && chosenSubProduct.id) {
+            if (panier == null) {
+                sessionStorage.setItem('panier', JSON.stringify([{"productid": chosenSubProduct.id, "quantite" : 1}]));
+            } else {
+                let cart = JSON.parse(panier);
+                let ishere = true;
+                cart.map( e => {
+                    console.log(e);
+                    if (e.productid == chosenSubProduct.id) {
+                        ishere = false;
+                    } 
+                });
+                cart.map( e => {
+                    if (e.productid == chosenSubProduct.id) {
+                        e.quantite = Number(e.quantite) + 1;
+                    } 
+                    if (ishere) {
+                        cart.push({"productid" : chosenSubProduct.id, "quantite": 1});
+                        ishere = false;
+                    }
+                });
+                sessionStorage.setItem('panier', JSON.stringify(cart));
+            }
+        } else {
+            console.log("pas select");
+            toast.error('Please select size and color !', {position: 'top-center'});
+        }
     }
 
     // Product doesnt have subproducts
@@ -250,6 +285,7 @@ function ProductDescription() {
 
     return (
         <div>
+            <ToastContainer />
             <div className="container-fluid m-0 p-0">
                 <div className="row">
                     <div className="col-md-7 productImgBg m-0 p-0">

@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -26,6 +27,7 @@ class Subproduct
     /**
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="subproducts")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"subproduct"})
      */
     private $product;
 
@@ -77,9 +79,15 @@ class Subproduct
      */
     private $color;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=SupplierOrder::class, mappedBy="subproduct")
+     */
+    private $supplierOrders;
+
     public function __construct()
     {
         $this->commandes = new ArrayCollection();
+        $this->supplierOrders = new ArrayCollection();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -219,6 +227,34 @@ class Subproduct
     public function setColor(?Color $color): self
     {
         $this->color = $color;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|SupplierOrder[]
+     */
+    public function getSupplierOrders(): Collection
+    {
+        return $this->supplierOrders;
+    }
+
+    public function addSupplierOrder(SupplierOrder $supplierOrder): self
+    {
+        if (!$this->supplierOrders->contains($supplierOrder)) {
+            $this->supplierOrders[] = $supplierOrder;
+            $supplierOrder->addSubproduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSupplierOrder(SupplierOrder $supplierOrder): self
+    {
+        if ($this->supplierOrders->contains($supplierOrder)) {
+            $this->supplierOrders->removeElement($supplierOrder);
+            $supplierOrder->removeSubproduct($this);
+        }
 
         return $this;
     }

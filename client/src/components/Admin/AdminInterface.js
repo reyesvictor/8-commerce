@@ -42,6 +42,10 @@ const AdminInterface = () => {
     const [imageId, setImageId] = useState(null);
     const [showCate, setShowCate] = useState(false);
     const [categoryName, setCategoryName] = useState([]);
+    const [showCateEdit, setShowCateEdit] = useState(false);
+    const [categoryNameEdit, setCategoryNameEdit] = useState([]);
+    const [cateEditId, setCateEditId] = useState(null);
+    const [oldCateEditName, setOldCateEditName] = useState('');
 
     const token = store.getState().auth.token
     const config = {
@@ -131,7 +135,7 @@ const AdminInterface = () => {
                     <tr key={category.id}>
                         <td><p className="m-2 align-items-center">{category.id}</p></td>
                         <td><p className="m-2">{category.name}</p></td>
-                        <td> <button onClick={() => window.location.href = 'admin/update/category/' + category.id} className="btn btn-outline-info m-1"> Modify </button></td>
+                        <td> <button onClick={e => e.preventDefault() + handleShowCateEdit(category.id, category.name)} className="btn btn-outline-info m-1"> Modify </button></td>
                         <td> <button onClick={() => window.location.href = '/admin/subcategory/' + category.id} className="btn btn-outline-dark m-1"> SubCategories</button></td>
                         <td> <button onClick={() => deleteCategory(category.id)} className="btn btn-outline-danger m-1"> Delete </button></td>
                     </tr>
@@ -212,11 +216,42 @@ const AdminInterface = () => {
             })
     }
 
+    const handleCloseCateEdit = () => setShowCateEdit(false);
+    const handleShowCateEdit = (id, name) => {
+        setShowCateEdit(true);
+        setCateEditId(id);
+        setOldCateEditName(name);
+    }
+    const onChangeCateEdit = (event) => {
+        let res = event.target.value.trim();
+        let str = res.toLowerCase();
+        let category = str.charAt(0).toUpperCase() + str.slice(1);
+        setCategoryNameEdit(category.replace(/[\s]{2,}/g, " "))
+    }
+    function onSubmitCateEdit(e) {
+        e.preventDefault();
+        if (categoryNameEdit.length === 0) {
+            return toast.error("You need to enter a new category", { position: "top-center" });
+        }
+        if (categoryNameEdit.match(/[\\'"/!$%^&*()_+|~=`{}[:;<>?,.@#\]]|\d+/)) {
+            return toast.error("Invalid charactere", { position: "top-center" });
+        } else {
+            const body = {
+                "name": categoryNameEdit,
+            }
+            axios.put("http://localhost:8000/api/category/"+cateEditId, body, config ).then( e => {
+                toast.success('Category correctly updated!', { position: "top-center"});
+                setShowCateEdit(false);
+            }).catch( err => {
+                toast.error('Error !', {position: 'top-center'});
+            });
+        }
+    }
+
     const AllProducts = () => {
         return (
             <>
                 <div className="row justify-content-end mb-2">
-
                     <button onClick={() => redirectCreate('product')} className="btn btn-success">
                         + New Product
                     </button>
@@ -239,6 +274,28 @@ const AdminInterface = () => {
                         </tbody>
                     </table>
                 </div>
+                <Modal show={showCateEdit} onHide={handleCloseCateEdit}>
+                    <Modal.Header closeButton>
+                        Update Category !
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form onSubmit={onSubmitCateEdit}>
+                            <FormGroup>
+                                <Label for="cateEdit">Category name</Label>
+                                <Input
+                                    type="text"
+                                    name="cateEdit"
+                                    id="cateEdit"
+                                    placeholder={oldCateEditName}
+                                    onChange={onChangeCateEdit}
+                                />
+                                <Button color="dark" className="mt-4" block>
+                                    Update
+                                </Button>
+                            </FormGroup>
+                        </Form>
+                    </Modal.Body>
+                </Modal>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <div>
                         <ReactPaginate
@@ -294,10 +351,10 @@ const AdminInterface = () => {
         e.preventDefault();
         
         if (categoryName.length === 0) {
-            return toast.error("You need to pick a photo", { position: "top-center" });
+            return toast.error("You need to enter a category", { position: "top-center" });
         }
 
-        if (categoryName.match(/[-\\'"/!$%^&*()_+|~=`{}[:;<>?,.@#\]]|\d+/)) {
+        if (categoryName.match(/[\\'"/!$%^&*()_+|~=`{}[:;<>?,.@#\]]|\d+/)) {
             return toast.error("Invalid charactere", { position: "top-center" });
         } else {
             const body = {

@@ -31,19 +31,32 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findSearchResult($searchString, $limit, $offset)
+    public function findSearchProduct($data)
     {
         $conn = $this->getEntityManager()
             ->getConnection();
-        $sql = '
-        SELECT * FROM product
-        WHERE title REGEXP ? OR description REGEXP ? LIMIT ? OFFSET ?
-        ';
+        $sql = "SELECT * FROM product 
+        LEFT JOIN subproduct ON product.id = subproduct.product_id 
+        WHERE title REGEXP ? GROUP BY product.id ORDER BY product.clicks DESC LIMIT 5";
+        // OR description REGEXP ?  IF WE WANT TO ADD BY DESCRIPTION AS WELL
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(1, $searchString, PDO::PARAM_STR);
-        $stmt->bindParam(2, $searchString, PDO::PARAM_STR);
-        $stmt->bindParam(3, $limit, PDO::PARAM_INT);
-        $stmt->bindParam(4, $offset, PDO::PARAM_INT);
+        $stmt->bindParam(1, $data['search'], PDO::PARAM_STR);
+        // $stmt->bindParam(2, $searchString, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function findSearchCategorySubcategory($data)
+    {
+        $conn = $this->getEntityManager()
+            ->getConnection();
+        $sql = "SELECT * FROM product 
+        LEFT JOIN subproduct ON product.id = subproduct.product_id 
+        WHERE title REGEXP ? GROUP BY product.id ORDER BY product.clicks DESC LIMIT 5";
+        // OR description REGEXP ?  IF WE WANT TO ADD BY DESCRIPTION AS WELL
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(1, $data['search'], PDO::PARAM_STR);
+        // $stmt->bindParam(2, $searchString, PDO::PARAM_STR);
         $stmt->execute();
         return $stmt->fetchAll();
     }
@@ -58,7 +71,11 @@ class ProductRepository extends ServiceEntityRepository
 
     public function filterProducts($data, $limit, $offset)
     {
-        $query = "SELECT * FROM product LEFT JOIN subproduct ON product.id = subproduct.product_id LEFT JOIN color ON subproduct.color_id = color.id WHERE ";
+        $query = "SELECT * FROM product 
+        LEFT JOIN subproduct ON product.id = subproduct.product_id 
+        LEFT JOIN color ON subproduct.color_id = color.id 
+        LEFT JOIN sub_category ON product.sub_category_id = sub_category.id
+        LEFT JOIN category ON sub_category.category_id = category.id WHERE ";
         $arrayExecute = [];
         if ($data['search']) {
             $query .= ' (product.title REGEXP ? OR product.description REGEXP ?) AND ';
@@ -90,8 +107,12 @@ class ProductRepository extends ServiceEntityRepository
             $query = substr($query, 0, -3);
             $query .= ') AND ';
         }
+        if ($data['category']) {
+            $query .= ' category.name REGEXP ? AND ';
+            array_push($arrayExecute, $data['category']);
+        }
         if ($data['subcategory']) {
-            $query .= ' product.sub_category_id = ? ';
+            $query .= ' sub_category.name REGEXP ?  ';
             array_push($arrayExecute, $data['subcategory']);
         }
         if (substr($query, -6) == "WHERE ") {

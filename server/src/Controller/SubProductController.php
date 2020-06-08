@@ -28,7 +28,7 @@ class SubProductController extends AbstractController
     {
         $subProduct = $subproductRepository->findOneBy(['id' => $request->attributes->get('id')]);
         if ($subProduct) {
-            return $this->json($subProduct, 200, [], ['groups' => 'products']);
+            return $this->json($subProduct, 200, [], ['groups' => 'subproduct']);
         } else {
             return $this->json(['message' => 'not found'], 404, []);
         }
@@ -37,17 +37,14 @@ class SubProductController extends AbstractController
     /**
      * @Route("/api/subproduct", name="subproduct_create", methods="POST")
      */
-    public function subProductCreate(Request $request, SerializerInterface $serializer, ProductRepository $productRepository, EntityManagerInterface $em, ValidatorInterface $validator)
+    public function subProductCreate(Request $request, SerializerInterface $serializer, ProductRepository $productRepository, SubproductRepository $subproductRepository, EntityManagerInterface $em, ValidatorInterface $validator)
     {
         try {
             $jsonContent = $request->getContent();
             $data = json_decode($jsonContent);
-            if (!isset($data->product_id)) return $this->json(['message' => 'product id missing.'], 400);
-
-            $product = $productRepository->findOneBy(['id' => $data->product_id]);
-
+            
             try {
-                $subproduct = $serializer->deserialize($jsonContent, Subproduct::class, 'json');
+                $subproduct = $serializer->deserialize($jsonContent, Subproduct::class, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['color', 'product', 'size']]);
             } catch (NotNormalizableValueException $e) {
                 return $this->json(['message' => $e->getMessage()], 400);
             }
@@ -56,6 +53,14 @@ class SubProductController extends AbstractController
             $color = $this->getDoctrine()->getRepository(Color::class)->find($data->color_id);
             if (!$color) return $this->json(['message' => 'color not found.'], 404);
 
+            if (!isset($data->size)) return $this->json(['message' => 'Size is missing.'], 400);
+            if ($subproductRepository->findOneBy(['color' => $color, 'size' => $data->size])) return $this->json(['message' => 'SubProduct already exists'], 400);
+            
+            if (!isset($data->product_id)) return $this->json(['message' => 'product id missing.'], 400);
+            $product = $productRepository->findOneBy(['id' => $data->product_id]);
+            if (!$product) return $this->json(['message' => 'product not found.'], 404);
+            
+            $subproduct->setSize(strtoupper($data->size));
             $subproduct->setColor($color);
             $subproduct->setCreatedAt(new \DateTime());
             $subproduct->setProduct($product);
@@ -67,7 +72,6 @@ class SubProductController extends AbstractController
             $em->flush();
 
             if (!file_exists("./images/$data->product_id/$data->color_id")) {
-                // mkdir("./public/images/$data->product_id", 0755, true);
                  mkdir("./images/$data->product_id/$data->color_id", 0777, true);
             }
 

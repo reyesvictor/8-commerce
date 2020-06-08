@@ -5,8 +5,15 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\User;
+use App\Entity\Supplier;
+use App\Entity\SupplierOrder;
+use App\Repository\SupplierRepository;
+use App\Repository\SupplierOrderRepository;
+use App\Repository\SubproductRepository;
 use App\Repository\UserRepository;
+use DateInterval;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +26,63 @@ use ReallySimpleJWT\Token;
 
 class UserController extends AbstractController
 {
+    /**
+     * @Route("/supplier", name="supplier", methods="GET")
+     */
+    public function addSupplier(EntityManagerInterface $em)
+    {
+     $supplier = new Supplier();
+     $supplier->setName('haolebg');
+     $em->persist($supplier);
+     $em->flush();
+
+     return new Response('hao est bien un bg');
+
+    }
+    /**
+     * @Route("/prout", name="prout", methods="GET")
+     */
+    public function addSupplierOrder(EntityManagerInterface $em,SupplierRepository $supplierOrder)
+    {
+
+        $supplier = $supplierOrder->findOneBy(['id' => 1]);
+        
+ 
+        $supplierOrder = new SupplierOrder();
+        $supplierOrder->setSupplier($supplier);
+        $supplierOrder->setOurAddress('4 rue de hao le bg');
+        $supplierOrder->setStatus(true);
+        $supplierOrder->setPrice(69);
+        $date = new DateTime();
+        $supplierOrder->setArrivalDate($date);
+        $supplierOrder->setCreatedAt(new DateTime());
+      
+        $em->persist($supplierOrder);
+        $em->flush();
+
+        return new Response('hao est bien un bg');
+
+    }
+
+    /**
+     * @Route("/prout2", name="prout2", methods="GET")
+     */
+    public function addSupplierProduct(EntityManagerInterface $em,SupplierOrderRepository $supplierrepo, SubProductRepository $subrepo)
+    {
+        $subproduct = $subrepo->findOneBy(['id' => 1]);
+        $supplierOrder = $supplierrepo->findOneBy(['id' => 1]);
+        $supplierOrder->addSubproduct($subproduct);
+
+        $em->persist($supplierOrder);
+        $em->flush();
+
+
+        return new Response('hao est bien un bg');
+
+    }
+
+
+
     /**
      * @Route("/user", name="user")
      */

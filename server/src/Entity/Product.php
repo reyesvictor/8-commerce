@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Product
 {
     /**
-     * @Groups({"products","category"})
+     * @Groups({"products","category","subproduct"})
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -25,7 +25,7 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"products","category"})
+     * @Groups({"products","category", "subproduct"})
      */
     private $title;
 
