@@ -35,17 +35,17 @@ class ProductController extends AbstractController
         $count = $productRepository->countResults();
         $products = $productRepository->findBy([], null, $request->query->get('limit'), $request->query->get('offset'));
         $products = $normalizer->normalize($products, null, ['groups' => 'products']);
-        $products = array_map(function($v){
-            $path = "./images/".$v['id']."/default";
+        $products = array_map(function ($v) {
+            $path = "./images/" . $v['id'] . "/default";
             if (!is_dir($path)) return $v;
 
             $imgArray = (array_diff(scandir($path), [".", ".."]));
-            $imgArray = array_map(function ($img) use ($v){
-                return "/api/image/". $v['id'] ."/default/$img";
+            $imgArray = array_map(function ($img) use ($v) {
+                return "/api/image/" . $v['id'] . "/default/$img";
             }, $imgArray);
             return array_merge($v, ["images" => array_values($imgArray)]);
         }, $products);
-        
+
         return $this->json(['nbResults' => $count, 'data' => $products], 200, [], ['groups' => 'products']);
     }
 
@@ -57,17 +57,17 @@ class ProductController extends AbstractController
         $count = $productRepository->countResults();
         $products = $productRepository->findBy([], array('clicks' => 'DESC'), $request->query->get('limit'), $request->query->get('offset'));
         $products = $normalizer->normalize($products, null, ['groups' => 'products']);
-        $products = array_map(function($v){
-            $path = "./images/".$v['id']."/default";
+        $products = array_map(function ($v) {
+            $path = "./images/" . $v['id'] . "/default";
             if (!is_dir($path)) return $v;
 
             $imgArray = (array_diff(scandir($path), [".", ".."]));
-            $imgArray = array_map(function ($img) use ($v){
-                return "/api/image/". $v['id'] ."/default/$img";
+            $imgArray = array_map(function ($img) use ($v) {
+                return "/api/image/" . $v['id'] . "/default/$img";
             }, $imgArray);
             return array_merge($v, ["images" => array_values($imgArray)]);
         }, $products);
-        
+
         return $this->json(['nbResults' => $count, 'data' => $products], 200, [], ['groups' => 'products']);
     }
 
@@ -109,51 +109,47 @@ class ProductController extends AbstractController
     {
         $productId = $request->attributes->get('id');
         $product = $productRepository->findOneBy(['id' => $productId]);
-        if ($product && !empty($product->getSubproducts()->getValues())) {
 
+        if ($product) {
             $productResp = $normalizer->normalize($product, null, ['groups' => 'products']);
             $sum = $productRepository->findStockSum($product);
             $productResp = array_merge($productResp, $sum[0]);
 
-            $imgArray = [];
-            $colorIdArr = scandir("./images/$productId");
-            $colorIdArr = array_filter($colorIdArr, function ($v) {
-                return is_numeric($v);
-            });
+            if (is_dir("./images/$productId")) {
+                $imgArray = [];
+                $colorIdArr = scandir("./images/$productId");
+                $colorIdArr = array_filter($colorIdArr, function ($v) {
+                    return is_numeric($v);
+                });
 
-            $path = "/api/image/$productId";
-            $ColorImgLinks["color_id"] = "default";
-            $imgLinks = array_diff(scandir("./images/$productId/default"), [".", ".."]);
-            $imgLinks = array_map(function ($v) use ($path) {
-                return "$path/default/$v";
-            }, $imgLinks);
-
-            $ColorImgLinks["links"] = array_values($imgLinks);
-            array_push($imgArray, $ColorImgLinks);
-            foreach ($colorIdArr as $v) {
-                $path = "/api/image/$productId/$v";
-                $ColorImgLinks["color_id"] = $v;
-                $imgLinks = array_diff(scandir("./images/$productId/$v"), [".", ".."]);
+                $path = "/api/image/$productId";
+                $ColorImgLinks["color_id"] = "default";
+                $imgLinks = array_diff(scandir("./images/$productId/default"), [".", ".."]);
                 $imgLinks = array_map(function ($v) use ($path) {
-                    return "$path/$v";
+                    return "$path/default/$v";
                 }, $imgLinks);
 
                 $ColorImgLinks["links"] = array_values($imgLinks);
                 array_push($imgArray, $ColorImgLinks);
+                foreach ($colorIdArr as $v) {
+                    $path = "/api/image/$productId/$v";
+                    $ColorImgLinks["color_id"] = $v;
+                    $imgLinks = array_diff(scandir("./images/$productId/$v"), [".", ".."]);
+                    $imgLinks = array_map(function ($v) use ($path) {
+                        return "$path/$v";
+                    }, $imgLinks);
+
+                    $ColorImgLinks["links"] = array_values($imgLinks);
+                    array_push($imgArray, $ColorImgLinks);
+                }
+                $productResp = array_merge($productResp, ["images" => $imgArray]);
             }
-            $productResp = array_merge($productResp, ["images" => $imgArray]);
 
             $product->setClicks($product->getClicks() + 1);
             $em->persist($product);
             $em->flush();
             return $this->json($productResp, 200, [], ['groups' => 'products']);
-        } else if (empty($product->getSubproducts()->getValues())) {
-            $productResp = $normalizer->normalize($product, null, ['groups' => 'products']);
-            $sum = $productRepository->findStockSum($product);
-            $productResp = array_merge($productResp, $sum[0]);
-            return $this->json($productResp, 200, [], ['groups' => 'products']);
-        }
-        else {
+        } else {
             return $this->json(['message' => 'not found'], 404, []);
         }
     }
@@ -177,22 +173,17 @@ class ProductController extends AbstractController
                     return $this->json(['message' => $e->getMessage()], 400, []);
                 }
                 if (isset($req->subcategory)) {
-                    $subcategory = $this->getDoctrine()->getRepository(SubCategory::class)->find($req->category);
+                    $subcategory = $this->getDoctrine()->getRepository(SubCategory::class)->find($req->subcategory);
                     $product->setSubCategory($subcategory);
                 }
                 if (isset($req->promo)) {
                     $promoNb = $req->promo === 0 ? null : $req->promo;
                     $product->setPromo($promoNb);
                 }
-                if (isset($req->title)) $product->setTitle($req->title);
-                if (isset($req->description)) $product->setDescription($req->description);
-                if (isset($req->sex)) $product->setSex($req->sex);
-                if (isset($req->status)) $product->setStatus($req->status);
-              
+
                 $error = $validator->validate($product);
-              
-                //if (count($error) > 0) return $this->json($error, 400);
-                //dd($product);
+                if (count($error) > 0) return $this->json($error, 400);
+
                 $em->persist($product);
                 $em->flush();
 
@@ -233,20 +224,20 @@ class ProductController extends AbstractController
     {
         $products = $productRepository->findSearchResult($request->attributes->get('search'), $request->query->get('limit'), $request->query->get('offset'));
         $products = $normalizer->normalize($products, null, ['groups' => 'products']);
-        $products = array_map(function($v){
-            $path = "./images/".$v['product_id']."/default";
+        $products = array_map(function ($v) {
+            $path = "./images/" . $v['product_id'] . "/default";
             if (!is_dir($path)) return $v;
 
             $imgArray = (array_diff(scandir($path), [".", ".."]));
-            $imgArray = array_map(function ($img) use ($v){
-                return "/api/image/". $v['product_id'] ."/default/$img";
+            $imgArray = array_map(function ($img) use ($v) {
+                return "/api/image/" . $v['product_id'] . "/default/$img";
             }, $imgArray);
             return array_merge($v, ["images" => array_values($imgArray)]);
         }, $products);
 
         return $this->json($products, 200);
     }
-    
+
     /**
      * @Route("/api/product/filter", name="product_filter", methods="POST")
      */
@@ -259,13 +250,13 @@ class ProductController extends AbstractController
 
         $products = $productRepository->filterProducts($data, $request->query->get('limit'), $request->query->get('offset'));
         $products = $normalizer->normalize($products, null, ['groups' => 'products']);
-        $products = array_map(function($v){
-            $path = "./images/".$v['product_id']."/default";
+        $products = array_map(function ($v) {
+            $path = "./images/" . $v['product_id'] . "/default";
             if (!is_dir($path)) return $v;
 
             $imgArray = (array_diff(scandir($path), [".", ".."]));
-            $imgArray = array_map(function ($img) use ($v){
-                return "/api/image/". $v['product_id'] ."/default/$img";
+            $imgArray = array_map(function ($img) use ($v) {
+                return "/api/image/" . $v['product_id'] . "/default/$img";
             }, $imgArray);
             return array_merge($v, ["images" => array_values($imgArray)]);
         }, $products);

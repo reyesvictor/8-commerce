@@ -82,13 +82,40 @@ function Home() {
                                 <div className='p-4 m-5 bg-gray'>
                                     <span className="HomeArticleTItle">{e.title.length > 50 ? e.title.substr(0,50) + '...': e.title }</span>
                                     <p>{e.lowest_price}</p>
-                                    <a href={"/product/" + e.id}>
+                                    {console.log(e.status)}
+                                    {e.images && e.status ==true && 
+                                     <> <a href={"/product/" + e.id}>
                                         <div className="ProductHomeImgContainer">
                                             {<img className="ProductHomeImg" src={ e.images ? 'http://127.0.0.1:8000'+e.images[1] : imageDefault}></img>}
                                             {<img className="ProductHomeImg ProductHomeImg2" src={ e.images && e.images.length > 1  ? 'http://127.0.0.1:8000'+e.images[0] : imageDefault}></img>}
                                         </div>
                                     </a>
-                                    <button className='btn-cart'>Add to cart</button>
+                                     <button className='btn-cart'>Add to cart</button>
+                                     </>
+                                    }
+                                    {e.images && e.status == false &&
+                                         <> <a href={"/product/" + e.id}>
+                                         <div className="ProductHomeImgContainer unavailable">
+                                             <img className="ProductHomeImg" src={'http://127.0.0.1:8000'+e.images[0]}></img>
+                                             {e.images && e.images.length > 1 &&
+                                                 <img className="ProductHomeImg ProductHomeImg2" src={'http://127.0.0.1:8000'+e.images[1]}></img>
+                                             }
+                                             {/* <img className="ProductHomeImg" src={e.images !== undefined ? 'http://127.0.0.1:8000'+e.images[0] : imageProduit1}></img> */}
+                                             {/* <img className="ProductHomeImg ProductHomeImg2" src={imageProduit2}></img> */}
+                                         </div>
+                                     </a>
+                                     <button className='btn-cart unavailable' disabled>Product unavailable</button>
+                                      </>    
+                                    }
+                                    {!e.images &&
+                                             <>
+                                             <img className="ProductHomeImg" src="https://etienneetienne.com/wp-content/uploads/2013/08/square-blank.png"></img>
+                                             <button className='btn-cart unavailable' disabled>Coming Soon</button>
+                                             </>
+                                    }
+                                    
+                                  
+                                    
                                 </div>
                             </div>
                         </div>

@@ -101,6 +101,7 @@ class CategoryController extends AbstractController
             $jsonContent = $request->getContent();
             $req = json_decode($jsonContent);
             $category = $categoryRepository->findOneBy(['id' => $request->attributes->get('id')]);
+            
             if ($category) {
                 if (isset($req->name)) {
                     $category->setName($req->name);
@@ -108,7 +109,6 @@ class CategoryController extends AbstractController
 
                 $error = $validator->validate($category);
                 if (count($error) > 0) return $this->json($error, 400);
-
                 $em->persist($category);
                 $em->flush();
 

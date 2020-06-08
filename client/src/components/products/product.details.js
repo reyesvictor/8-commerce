@@ -72,10 +72,10 @@ function ProductDescription() {
     let testProps = "";
     let subCategory = "";
     let Categoryname = '';
-
-
+    let Unavailable = []
+  
     if (product) {
-
+        console.log(product)
         if (product.length == 0) {
             loadingScreen.push(<div className="loading-screen"></div>);
         }
@@ -95,6 +95,10 @@ function ProductDescription() {
                         ColorOption.push(<option value={product.subproducts[i].color}>{product.subproducts[i].color}</option>);
                 }
             }
+        }
+        if (product.status == false) {
+        Unavailable.push(<div className="overlayUnavailable"><h5>This product is unavailable</h5></div>);
+        countstockAll = 0;
         }
     }
 
@@ -179,6 +183,7 @@ function ProductDescription() {
         return (
             <div className="divDetails">
                 <span><a href={pathCat}>{Categoryname}</a> / <a href={pathSub}>{subCategory}</a></span>
+                {Unavailable}
                 <h1>{details.title}</h1>
                 <h3 className='prix'>{verifyIfAProductIsChosen() ? chosenSubProduct.price + '€' : details.price}</h3>
                 <p className='description'>
@@ -204,7 +209,7 @@ function ProductDescription() {
                     </>
                     : null
                 }
-                <button className='btn-cart'>Add to cart</button>
+               {product.status == true ?  <button className='btn-cart'>Add to cart</button> :  <button className='btn-cart'>Out of stock</button>}
             </div>
         )
     }
@@ -215,6 +220,7 @@ function ProductDescription() {
             <div className="divDetails">
                 <h1>{details.title}</h1>
                 <h3 className='prix'>{verifyIfAProductIsChosen() ? chosenSubProduct.price + '€' : details.price} </h3>
+                {Unavailable}
                 <p className='description'>
                     {details.description_1}
                     <span className='complete'>{details.description_2}</span>
@@ -244,16 +250,21 @@ function ProductDescription() {
 
     return (
         <div>
-
             <div className="container-fluid m-0 p-0">
                 <div className="row">
                     <div className="col-md-7 productImgBg m-0 p-0">
-                        <div className='ulImgProduct'>
+                    {product.status == true ?  <> <div className='ulImgProduct'>
                             {miniImageProduct}
                         </div>
                         <div className='ImageContainer'>
                             {imageProduct}
+                        </div></> : <>
+                            <div className='ulImgProduct unavailable'>
+                            {miniImageProduct}
                         </div>
+                        <div className='ImageContainer unavailable'>
+                            {imageProduct}
+                        </div></>}                        
                     </div>
                     <div className="col-md-5 m-0 p-0">
                         {product.subproducts && product.subproducts.length > 0 ? subproductsAvailable() : subproductsUnavailable()}

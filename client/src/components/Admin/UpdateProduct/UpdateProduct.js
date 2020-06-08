@@ -22,13 +22,15 @@ const UpdateProduct = () => {
     const [subCategory, setSubCategory] = useState(1);
     const [sex, setSex] = useState('');
     const [status, setStatus] = useState(false);
-    
+    const [allCategory, setAllCategory] = useState([]);
+    const [subCategories, setSubCategories] = useState(1);
     const token = store.getState().auth.token
     const config = {
         headers: {
                 "Content-type": "application/json"
         }
     }
+
     useEffect(() => {
         if (token) {
             config.headers['x-auth-token'] = token
@@ -41,36 +43,50 @@ const UpdateProduct = () => {
         setIsReady(true);
     }
     useEffect(() => {
-        axios.get("http://localhost:8000/api/product/"+idProduct, config)
-        .then(res => {
-                console.log(res.data);
-                setProduct(res.data);   
-                setTitle(res.data.title);
-                setDescription(res.data.description);
-                setPrice(res.data.price);
-                if (res.data.promo === null) setPromo(0);
-                else setPromo(res.data.promo);
-                setSubCategory(res.data.subCategory)
-                setSex(res.data.sex)
-                setStatus(res.data.status)
+        axios.get("http://localhost:8000/api/product/"+ idProduct, config)
+        .then( async res => {
+        
+            console.log(res.data);        
+          
+            await axios.get("http://127.0.0.1:8000/api/subcategory", config).then( e => {
+                setAllCategory(e.data);
+                const optionCategory = [];
+                e.data.map( category => {
+                    category.name === res.data.subCategory.name 
+                    ? optionCategory.push(<option key={category.id} defaultValue={category.id} selected>{category.name}</option>)
+                    : optionCategory.push(<option key={category.id} value={category.id}>{category.name}</option>)
+                });
+                setSubCategories(optionCategory)
+            });
+            setProduct(res.data);   
+            setTitle(res.data.title);
+            setDescription(res.data.description);
+            setPrice(res.data.price);
+            if (res.data.promo === null) setPromo(0);
+            else setPromo(res.data.promo);
+            setSubCategory(res.data.subCategory.id)
+            setSex(res.data.sex)
+            setStatus(res.data.status)
         })
         .catch(error => {
             toast.error('Error !', {position: 'top-center'});
         });
     }, [])
+
     useEffect( () => {
         if (isReady) {
             setIsReady(false);
             const body = {
                 "title": title,
                 "description": description,
-                "category": subCategory.id,
+                "subcategory": parseInt(subCategory),
                 "price": parseInt(price),
                 "promo": parseInt(promo),
                 "sex": sex,
                 "status": status
             }
             console.log(body);
+        
             axios.put("http://localhost:8000/api/product/"+idProduct, body, config ).then( e => {
                 toast.success('Product correctly updated!', { position: "top-center"})
             }).catch( err => {
@@ -78,6 +94,8 @@ const UpdateProduct = () => {
             });
         }
     }, [isReady]);
+
+    console.log(subCategory)
     return (
         <div className='container'>
             <ToastContainer />
@@ -96,8 +114,12 @@ const UpdateProduct = () => {
                     <textarea className="inputeStyle" name="description" id="description" form="formItem" placeholder="Your item description .." value={description} onChange={(e) => setDescription(e.target.value)}/>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="category">Category</label>
-                    <input className="inputeStyle form-control" type="text" name="category" placeholder="category" value={subCategory.id} onChange={(e) => setSubCategory(e.target.value)}/>
+                    {/* <label htmlFor="category">Category</label>
+                    <input className="inputeStyle form-control" type="text" name="category" placeholder="category" value={subCategory.id} onChange={(e) => setSubCategory(e.target.value)}/> */}
+                    <select className="form-control form-control-lg " id="selectCategory" onChange={(e) => setSubCategory(parseInt(e.target.value))}>
+                        <option value="" >--- CHOICE CATEGORY ---</option>
+                        {subCategories}
+                    </select>
                 </div>
                 <div className="form-group">
                     <label htmlFor="price">Price</label>

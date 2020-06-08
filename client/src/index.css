@@ -66,6 +66,16 @@ code {
     background-color: #f0f0f0;
 }
 
+.ulImgProduct.unavailable img {
+    filter: grayscale(50%);
+    opacity: 0.5
+}
+
+.ImageContainer.unavailable img {
+    opacity: 0.8
+
+}
+
 .ImageContainer {
     margin: 0 0 0 9vw;
 }
@@ -75,6 +85,7 @@ code {
     margin: 0 auto;
     width: 60%;
     position: sticky;
+    margin-bottom: 20%;
 }
 
 .divDetails:hover .more {
@@ -82,13 +93,16 @@ code {
 }
 
 .prix {
-height: 2vw;    
+    height: 2vw;
 }
 
 .description {
     margin: 0.5vh;
 }
-.imgScroll {width: 45vw!important;}
+
+.imgScroll {
+    width: 45vw!important;
+}
 
 .imgScroll div:nth-child(3) {
     margin: 0vh 0 0 5.4vw!important;
@@ -132,17 +146,31 @@ height: 2vw;
     .imgScroll div:nth-child(3) {
         display: none
     }
-
-.imgScroll {width: 90vw!important;}
-
+    .imgScroll {
+        width: 90vw!important;
+    }
 }
 
-.sndrow { background-color: #f0f0f0;}
+.sndrow {
+    background-color: #f0f0f0;
+}
+
+.overlayUnavailable {
+    position: absolute;
+    background-color: #ffffff;
+    opacity: 0.80;
+    width: 100%;
+    height: 110%;
+    display: flex;
+    align-items: center!important;
+    justify-content: center;
+}
+
 
 /*---------- homepage ----------*/
 
 .HomeJumbotron {
-    height: 75vh;
+    height: 70vh;
 }
 
 .HomeJumbotron div {
@@ -173,6 +201,11 @@ height: 2vw;
     transition: all 0.2s ease-in-out;
 }
 
+.ProductHomeImgContainer.unavailable {
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+
 .ProductHomeImg {
     width: 70%;
     position: relative;
@@ -200,6 +233,12 @@ height: 2vw;
     transform-origin: bottom center;
     transform: scale(1, 0);
     width: 70%!important;
+}
+
+.btn-cart.unavailable {
+    background-color: #adadad!important;
+    border: 1px solid #adadad;
+    /* transform: scale(1, 1); */
 }
 
 .ProductHome p {

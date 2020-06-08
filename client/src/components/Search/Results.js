@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 const image1 = "https://i.imgur.com/wtIes8O.jpg";
 let imageDefault = "https://i.ibb.co/j5qSV4j/missing.jpg";
 
@@ -6,6 +6,8 @@ function Results(props) {
 
   const results = props.results
   console.log(results)
+  console.log("Receiving request !!")
+
   let imageDefault = "https://i.ibb.co/j5qSV4j/missing.jpg";
   let imageProduit1 = '';
   let imageProduit2 = ''
@@ -20,7 +22,6 @@ function Results(props) {
       <div className="row justify-content-around">
 
         {results.map((e) => {
-          console.log(e)
           return (
             <div className="col-md-4" key={e.product_id + '-' + e.id}>
               <div className='ProductHome'>

@@ -3,7 +3,6 @@ import $ from "jquery";
 import Dropdown from "react-bootstrap/Dropdown";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
-import Button from "react-bootstrap/Button";
 import Collapse from "react-bootstrap/Collapse";
 import ReactBootstrapSlider from "react-bootstrap-slider";
 import "bootstrap/dist/css/bootstrap.css";
@@ -41,7 +40,7 @@ export default class SearchSidebar extends Component {
 
       isResultsReady: false,
 
-      searchValue: null,
+      searchValue: null
     };
 
     this.handleSearch = this.handleSearch.bind(this);
@@ -59,15 +58,15 @@ export default class SearchSidebar extends Component {
   }
 
   handleSearch(e) {
-    this.setState({ searchValue: e.target.value });
+    this.setState({ searchValue: e.target.value, isResultsReady: false });
   }
 
   sliderChangeValue(e) {
-    this.setState({ sliderCurrentValue: e.target.value });
+    this.setState({ sliderCurrentValue: e.target.value, isResultsReady: false });
   }
 
   handleSexe(e) {
-    this.setState({ sexe: e.target.value });
+    this.setState({ sexe: e.target.value, isResultsReady: false });
   }
 
   handleSize(e) {

@@ -40,6 +40,8 @@ const AdminInterface = () => {
     const [showImage, setShowImage] = useState(false);
     const [picture, setPicture] = useState([]);
     const [imageId, setImageId] = useState(null);
+    const [showCate, setShowCate] = useState(false);
+    const [categoryName, setCategoryName] = useState([]);
 
     const token = store.getState().auth.token
     const config = {
@@ -279,13 +281,65 @@ const AdminInterface = () => {
         )
     }
 
+    const handleCloseCate = () => setShowCate(false);
+    const handleShowCate = () => setShowCate(true);
+    const onChangeCate = (event) => {
+        let res = event.target.value.trim();
+        let str = res.toLowerCase();
+        let category = str.charAt(0).toUpperCase() + str.slice(1);
+        setCategoryName(category.replace(/[\s]{2,}/g, " "));
+    }
+
+    function onSubmitCate(e) {
+        e.preventDefault();
+        
+        if (categoryName.length === 0) {
+            return toast.error("You need to pick a photo", { position: "top-center" });
+        }
+
+        if (categoryName.match(/[-\\'"/!$%^&*()_+|~=`{}[:;<>?,.@#\]]|\d+/)) {
+            return toast.error("Invalid charactere", { position: "top-center" });
+        } else {
+            const body = {
+                "name": categoryName
+            }
+            axios.post("http://127.0.0.1:8000/api/category/create/" + categoryName, body, config).then( res => {
+                toast.success('Category correctly added!', {position: "top-center"});
+            }).catch( err => {
+                toast.error('Category already exist!', {position: 'top-center'});
+            });
+            setShowCate(false);
+        }
+    }
+
     const AllCategories = () => {
         return (
             <>
                 <div className="row justify-content-end mb-2">
-                    <button onClick={() => redirectCreate('category')} className="btn btn-success m-1">
+                    <button onClick={handleShowCate} className="btn btn-success m-1">
                         + New Category
                     </button>
+                        <Modal show={showCate} onHide={handleCloseCate}>
+                            <Modal.Header closeButton>
+                                Create category !
+                            </Modal.Header>
+                            <Modal.Body>
+                                <Form onSubmit={onSubmitCate}>
+                                    <FormGroup>
+                                        <Label for="category">Category name</Label>
+                                        <Input
+                                            type="text"
+                                            name="category"
+                                            id="category"
+                                            onChange={onChangeCate}
+                                        />
+                                        <Button color="dark" className="mt-4" block>
+                                            Submit
+                                        </Button>
+                                    </FormGroup>
+                                </Form>
+                            </Modal.Body>
+                        </Modal>
                     <button onClick={() => redirectCreate('subcategory')} className="btn btn-success m-1">
                         + New SubCategory
                     </button>
@@ -444,7 +498,7 @@ const AdminInterface = () => {
                                         onChange={onChangeColor}
                                     />
                                     <Button color="dark" className="mt-4" block>
-                                        Update
+                                        Create
                                 </Button>
                                 </FormGroup>
                             </Form>
