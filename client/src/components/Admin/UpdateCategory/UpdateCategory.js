@@ -58,7 +58,7 @@ const UpdateProduct = () => {
         <div className='container'>
             <ToastContainer />
             <h1 className="text-center">Update your Category !</h1>
-            <button onClick={() => window.location.href='/admin'} className='float-right btn btn-warning mb-3'> Back to dashboard </button>
+            <button onClick={() => window.location.href='/admin'} className='float-right btn btn-warning mb-3'> Back to Dashboard </button>
             <button onClick={() => window.location.href='/admin/subcategory/'+idCategory} className="btn btn-outline-dark m-2 float-right">View subCategory</button>
             <form id="formItem">
                 <div className="form-group">

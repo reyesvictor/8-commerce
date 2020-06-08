@@ -83,7 +83,7 @@ const CreateImageSubproduct = () => {
              <button className='btn btn-primary' onClick={sendImage}> Send image </button>
              <div className="btnLink">
                 <button onClick={() => window.location.href='/admin/subproduct/'+idproduct} className='float-right btn btn-info m-2'> Back to the Subproduct </button>
-                <button onClick={() => window.location.href='/admin'} className='btn btn-warning margin-righ mt-5'> Back to dashboard </button>
+                <button onClick={() => window.location.href='/admin'} className='btn btn-warning margin-righ mt-5'> Back to Dashboard </button>
             </div>
         </div>
     )

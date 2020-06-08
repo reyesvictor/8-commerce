@@ -82,8 +82,10 @@ const UpdateProduct = () => {
         <div className='container'>
             <ToastContainer />
             <h1 className="text-center">Update your Product !</h1>
-            <button onClick={() => window.location.href='/admin'} className='float-right btn btn-warning mb-3'> Back to dashboard </button>
-            <button onClick={() => window.location.href='/admin/subproduct/'+idProduct} className="btn btn-outline-dark m-2 float-right">View subproduct</button>
+            <div className="row justify-content-end mb-2">
+            <button onClick={() => window.location.href='/admin/subproduct/'+idProduct} className="btn btn-outline-dark m-2"> View subproducts </button>
+            <button onClick={() => window.location.href='/admin'} className='btn btn-warning m-2'> Back to Dashboard </button>
+            </div>
             <form id="formItem">
                 <div className="form-group">
                     <label htmlFor="title">Title</label>

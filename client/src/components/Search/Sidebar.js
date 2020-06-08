@@ -19,9 +19,9 @@ export default class SearchSidebar extends Component {
     super();
 
     this.state = {
-      sliderCurrentValue: [0, 500],
+      sliderCurrentValue: [0, 5000],
       sliderStep: 50,
-      sliderMax: 500,
+      sliderMax: 5000,
       sliderMin: 0,
 
       sexe: null,

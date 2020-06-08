@@ -68,7 +68,7 @@ function UpdateSubCategory() {
         <div className='container'>
             <ToastContainer />
             <h1 className="text-center">Update the Subproduct {'id ('+idSubCategory+')'} for <b>{nameCategory}</b> !</h1>
-            <button onClick={() => window.location.href='/admin'} className='float-right btn btn-warning m-2'> Back to dashboard </button>
+            <button onClick={() => window.location.href='/admin'} className='float-right btn btn-warning m-2'> Back to Dashboard </button>
             <button onClick={() => window.location.href='/admin/subcategory/'+id} className='float-right btn btn-info m-2'> Back to the Subcategory </button>
             <form id="formItem">
                 <div className="form-group">

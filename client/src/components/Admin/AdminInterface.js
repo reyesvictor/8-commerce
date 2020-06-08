@@ -80,13 +80,15 @@ const AdminInterface = () => {
                     <tr key={product.id}>
                         <td><p className="m-2 align-items-center">{product.id}</p></td>
                         <td><p className="m-2">{product.title.length > 15 ? product.title.substr(0, 15) + '...' : product.title}</p></td>
-                        <td><p className="m-2">{product.status ? 'Active' : 'Inactive'}</p></td>
                         <td><p className="m-2">{product.subCategory.name.length > 15 ? product.subCategory.name.substr(0, 15) + "..." : product.subCategory.name}</p></td>
+                        <td><p className="m-2">{product.status ? 'Active' : 'Inactive'}</p></td>
                         <td><p className="m-2">{product.sex}</p></td>
-                        <td><button onClick={e => e.preventDefault() + handleShowImage(product.id)} className="btn add btn-outline-success">Add</button></td>
-                        <td><button onClick={() => window.location.href = 'admin/subproduct/' + product.id} className="btn btn-outline-dark "><span className="viewsub">View</span></button></td>
-                        <td><button onClick={() => window.location.href = 'admin/update/product/' + product.id} className="btn modify btn-outline-info m-2">Modify</button></td>
-                        <td><button onClick={() => deleteProduct(product.id)} className="btn delete btn-outline-danger mr-2">Delete</button></td>
+                        <td>
+                            <button onClick={e => e.preventDefault() + handleShowImage(product.id)} className="btn add btn-outline-success m-1">Add Image</button>
+                            <button onClick={() => window.location.href = 'admin/update/product/' + product.id} className="btn modify btn-outline-info m-1">Modify</button>
+                            <button onClick={() => window.location.href = 'admin/subproduct/' + product.id} className="btn btn-outline-dark m-1"><span className="viewsub">SubProducts</span></button>
+                            <button onClick={() => deleteProduct(product.id)} className="btn delete btn-outline-danger m-1">Delete</button>
+                        </td>
                     </tr>
                 )
                 setPostData(newPostData)
@@ -127,9 +129,9 @@ const AdminInterface = () => {
                     <tr key={category.id}>
                         <td><p className="m-2 align-items-center">{category.id}</p></td>
                         <td><p className="m-2">{category.name}</p></td>
-                        <td> <button onClick={() => window.location.href = '/admin/subcategory/' + category.id} className="btn btn-outline-dark m-2">View</button></td>
-                        <td> <button onClick={() => window.location.href = 'admin/update/category/' + category.id} className="btn btn-outline-info m-2">Modify</button></td>
-                        <td> <button onClick={() => deleteCategory(category.id)} className="btn btn-outline-danger m-2">Delete</button></td>
+                        <td> <button onClick={() => window.location.href = 'admin/update/category/' + category.id} className="btn btn-outline-info m-1"> Modify </button></td>
+                        <td> <button onClick={() => window.location.href = '/admin/subcategory/' + category.id} className="btn btn-outline-dark m-1"> SubCategories</button></td>
+                        <td> <button onClick={() => deleteCategory(category.id)} className="btn btn-outline-danger m-1"> Delete </button></td>
                     </tr>
                 )
                 setPostDataCategories(newPostDataCategories)
@@ -213,7 +215,7 @@ const AdminInterface = () => {
             <>
                 <div className="row justify-content-end mb-2">
 
-                    <button onClick={() => redirectCreate('product')} className="btn btn-dark">
+                    <button onClick={() => redirectCreate('product')} className="btn btn-success">
                         + New Product
                     </button>
                 </div>
@@ -223,11 +225,11 @@ const AdminInterface = () => {
                             <tr>
                                 <th><p className="m-2 align-items-center"> ID </p></th>
                                 <th><p className="m-2"> Title </p></th>
-                                <th><p className="m-2"> Status </p></th>
                                 <th><p className="m-2"> SubCategory </p></th>
+                                <th><p className="m-2"> Status </p></th>
                                 <th><p className="m-2"> Sex </p></th>
-                                <th><p className="m-2"> Image </p></th>
-                                <th colSpan="3"><p className="m-2"> Subproduct </p></th>
+                                {/* <th><p className="m-2"> Image </p></th> */}
+                                <th colSpan="4"><p className="m-2"> Actions </p></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -281,11 +283,10 @@ const AdminInterface = () => {
         return (
             <>
                 <div className="row justify-content-end mb-2">
-
-                    <button onClick={() => redirectCreate('category')} className="btn btn-dark">
+                    <button onClick={() => redirectCreate('category')} className="btn btn-success m-1">
                         + New Category
                     </button>
-                    <button onClick={() => redirectCreate('subcategory')} className="btn btn-secondary">
+                    <button onClick={() => redirectCreate('subcategory')} className="btn btn-success m-1">
                         + New SubCategory
                     </button>
                 </div>
@@ -295,6 +296,7 @@ const AdminInterface = () => {
                             <tr>
                                 <th><p className="m-2 align-items-center"> ID </p></th>
                                 <th><p className="m-2"> Name </p></th>
+                                <th><p colspan="3" className="m-1"> Actions </p></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -421,7 +423,7 @@ const AdminInterface = () => {
         return (
             <>
                 <div className="row justify-content-end mb-2">
-                    <button onClick={handleShowColor} className="btn btn-dark btn-color mr-4">
+                    <button onClick={handleShowColor} className="btn btn-success mr-4 pr-5 pl-5">
                         + New Color
                     </button>
 
@@ -449,7 +451,7 @@ const AdminInterface = () => {
                         </Modal.Body>
                     </Modal>
 
-                    <button onClick={handleShow} className="btn btn-dark btn-color">
+                    <button onClick={handleShow} className="btn btn-info pl-5 pr-5">
                         Update Color
                     </button>
 
@@ -500,14 +502,15 @@ const AdminInterface = () => {
     return (
         <div className="container adminTable">
             <ToastContainer />
+
             <h1 className="mb-5">
                 <i class="material-icons md-36">speed</i> ADMIN - Dashboard
             </h1>
             <Tabs forceRenderTabPanel={true}>
-                <TabList className="tabsHolder">
-                    <Tab><h3 className="tabtitles mr-auto ml-2">All Products</h3></Tab>
-                    <Tab><h3 className="tabtitles mr-auto ml-2">All Categories</h3></Tab>
-                    <Tab><h3 className="tabtitles mr-auto ml-2">All Colors</h3></Tab>
+                <TabList className="tabsHolder" style={{ paddingLeft: 0 }}>
+                    <Tab><h3 className="tabtitles mr-3 ml-3">Products</h3></Tab>
+                    <Tab><h3 className="tabtitles mr-3 ml-3">Categories</h3></Tab>
+                    <Tab><h3 className="tabtitles mr-3 ml-3">Colors</h3></Tab>
                 </TabList>
                 <TabPanel>
                     {AllProducts()}

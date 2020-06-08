@@ -99,7 +99,7 @@ function UpdateSubProduct() {
         <div className='container'>
             <ToastContainer />
             <h1 className="text-center">Update the Subproduct {'id ('+idSubproduct+')'} for <b>{titleProduct}</b> !</h1>
-            <button onClick={() => window.location.href='/admin'} className='float-right btn btn-warning m-2'> Back to dashboard </button>
+            <button onClick={() => window.location.href='/admin'} className='float-right btn btn-warning m-2'> Back to Dashboard </button>
             <button onClick={() => window.location.href='/admin/subproduct/'+id} className='float-right btn btn-info m-2'> Back to the Subproduct </button>
             <form id="formItem">
                 <div className="form-group">

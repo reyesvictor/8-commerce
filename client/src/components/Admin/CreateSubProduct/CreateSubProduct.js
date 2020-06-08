@@ -79,7 +79,7 @@ function CreateSubProduct() {
         <div className='container'>
             <ToastContainer />
             <h1 className="text-center">Create a new Subproduct for <b>{titleProduct}</b> !</h1>
-            <button onClick={() => window.location.href='/admin'} className='float-right btn-warning'> Back to dashboard </button>
+            <button onClick={() => window.location.href='/admin'} className='float-right btn-warning'> Back to Dashboard </button>
             <button onClick={() => window.location.href='/admin/subproduct/'+id} className='float-right btn-info'> Back to the Subproduct </button>
             <form id="formItem">
                 <div className="form-group">

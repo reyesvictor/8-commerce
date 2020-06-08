@@ -10,17 +10,10 @@ const image1 = "https://i.imgur.com/wtIes8O.jpg";
 function Home() {
 
     const [products, setProducts] = useState([]);
-
+    let imageDefault = "https://i.ibb.co/j5qSV4j/missing.jpg";
     let imageProduit1 = '';
     let imageProduit2 = ''
-    let nbrArctPop = 5;
-    const isEmpty = (obj) => {
-        for (var key in obj) {
-            if (obj.hasOwnProperty(key))
-                return false;
-        }
-        return true;
-    }
+    let nbrArctPop = 6;
 
     useEffect(() => {
         axios.get('http://127.0.0.1:8000/api/product/home?limit='+nbrArctPop).then(resp => {
@@ -61,8 +54,17 @@ function Home() {
         return () => {
         }
     }, []);
-    return (
 
+    const isEmpty = (obj) => {
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key))
+                return false;
+        }
+        return true;
+    }
+    
+
+    return (
         <div className="container-fluid h-100 p-0 m-0">
             <Parallax bgImage={image1} strength={500}>
                 <div className="HomeJumbotron">
@@ -74,14 +76,11 @@ function Home() {
             <div className="row justify-content-around">
 
                 {products.map((e) => {
-                    let imageDefault = "https://i.ibb.co/j5qSV4j/missing.jpg";
-
                     return (
                         <div className="col-md-4" key={e.id}>
                             <div className='ProductHome'>
-                                {/* <img src={'../../../../images/1/default/2020-06-0603-16-51.jpg'} />  */}
                                 <div className='p-4 m-5 bg-gray'>
-                                    <span className="HomeArticleTItle">{e.title.length > 15 ? e.title.substr(0,15) : e.title }</span>
+                                    <span className="HomeArticleTItle">{e.title.length > 50 ? e.title.substr(0,50) + '...': e.title }</span>
                                     <p>{e.lowest_price}</p>
                                     <a href={"/product/" + e.id}>
                                         <div className="ProductHomeImgContainer">
