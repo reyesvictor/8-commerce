@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import $ from 'jquery';
-import { Parallax,Background } from "react-parallax";
+import { Parallax, Background } from "react-parallax";
 import './UpdateProduct.css';
 import axios from 'axios';
 import { useRouteMatch } from "react-router-dom";
@@ -27,7 +27,7 @@ const UpdateProduct = () => {
     const token = store.getState().auth.token
     const config = {
         headers: {
-                "Content-type": "application/json"
+            "Content-type": "application/json"
         }
     }
 
@@ -43,37 +43,37 @@ const UpdateProduct = () => {
         setIsReady(true);
     }
     useEffect(() => {
-        axios.get("http://localhost:8000/api/product/"+ idProduct, config)
-        .then( async res => {
-        
-            console.log(res.data);        
-          
-            await axios.get("http://127.0.0.1:8000/api/subcategory", config).then( e => {
-                setAllCategory(e.data);
-                const optionCategory = [];
-                e.data.map( category => {
-                    category.name === res.data.subCategory.name 
-                    ? optionCategory.push(<option key={category.id} defaultValue={category.id} selected>{category.name}</option>)
-                    : optionCategory.push(<option key={category.id} value={category.id}>{category.name}</option>)
+        axios.get("http://localhost:8000/api/product/" + idProduct, config)
+            .then(async res => {
+
+                console.log(res.data);
+
+                await axios.get("http://127.0.0.1:8000/api/subcategory", config).then(e => {
+                    setAllCategory(e.data);
+                    const optionCategory = [];
+                    e.data.map(category => {
+                        category.name === res.data.subCategory.name
+                            ? optionCategory.push(<option key={category.id} defaultValue={category.id} selected>{category.name}</option>)
+                            : optionCategory.push(<option key={category.id} value={category.id}>{category.name}</option>)
+                    });
+                    setSubCategories(optionCategory)
                 });
-                setSubCategories(optionCategory)
+                setProduct(res.data);
+                setTitle(res.data.title);
+                setDescription(res.data.description);
+                setPrice(res.data.price);
+                if (res.data.promo === null) setPromo(0);
+                else setPromo(res.data.promo);
+                setSubCategory(res.data.subCategory.id)
+                setSex(res.data.sex)
+                setStatus(res.data.status)
+            })
+            .catch(error => {
+                toast.error('Error !', { position: 'top-center' });
             });
-            setProduct(res.data);   
-            setTitle(res.data.title);
-            setDescription(res.data.description);
-            setPrice(res.data.price);
-            if (res.data.promo === null) setPromo(0);
-            else setPromo(res.data.promo);
-            setSubCategory(res.data.subCategory.id)
-            setSex(res.data.sex)
-            setStatus(res.data.status)
-        })
-        .catch(error => {
-            toast.error('Error !', {position: 'top-center'});
-        });
     }, [])
 
-    useEffect( () => {
+    useEffect(() => {
         if (isReady) {
             setIsReady(false);
             const body = {
@@ -86,11 +86,11 @@ const UpdateProduct = () => {
                 "status": status
             }
             console.log(body);
-        
-            axios.put("http://localhost:8000/api/product/"+idProduct, body, config ).then( e => {
-                toast.success('Product correctly updated!', { position: "top-center"})
-            }).catch( err => {
-                toast.error('Error !', {position: 'top-center'});
+
+            axios.put("http://localhost:8000/api/product/" + idProduct, body, config).then(e => {
+                toast.success('Product correctly updated!', { position: "top-center" })
+            }).catch(err => {
+                toast.error('Error !', { position: 'top-center' });
             });
         }
     }, [isReady]);
@@ -99,43 +99,43 @@ const UpdateProduct = () => {
     return (
         <div className='container'>
             <ToastContainer />
-            <h1 className="text-center">Update your Product !</h1>
+            <h1 className="text-center">Update your Product<br /><b>{title}</b></h1>
             <div className="row justify-content-end mb-2">
-            <button onClick={() => window.location.href='/admin/subproduct/'+idProduct} className="btn btn-outline-dark m-2"> View subproducts </button>
-            <button onClick={() => window.location.href='/admin'} className='btn btn-warning m-2'> Back to Dashboard </button>
+                <button onClick={() => window.location.href = '/admin/subproduct/' + idProduct} className="btn btn-outline-dark m-2"> View subproducts </button>
+                <button onClick={() => window.location.href = '/admin'} className='btn btn-warning m-2'> Back to Dashboard </button>
             </div>
             <form id="formItem">
                 <div className="form-group">
                     <label htmlFor="title">Title</label>
-                    <input className="inputeStyle form-control" type="text" name="title" placeholder="Title Article" value={title} onChange={(e) => setTitle(e.target.value)}/>
+                    <input className="inputeStyle form-control" type="text" name="title" placeholder="Title Article" value={title} onChange={(e) => setTitle(e.target.value)} />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="description">Description</label><br/>
-                    <textarea className="inputeStyle" name="description" id="description" form="formItem" placeholder="Your item description .." value={description} onChange={(e) => setDescription(e.target.value)}/>
+                    <label htmlFor="description">Description</label><br />
+                    <textarea className="inputeStyle" name="description" id="description" form="formItem" placeholder="Your item description .." value={description} onChange={(e) => setDescription(e.target.value)} />
                 </div>
                 <div className="form-group">
                     {/* <label htmlFor="category">Category</label>
                     <input className="inputeStyle form-control" type="text" name="category" placeholder="category" value={subCategory.id} onChange={(e) => setSubCategory(e.target.value)}/> */}
-                    <select className="form-control form-control-lg " id="selectCategory" onChange={(e) => setSubCategory(parseInt(e.target.value))}>
+                    <select className="form-control form-control-lg" id="selectCategory" onChange={(e) => setSubCategory(parseInt(e.target.value))}>
                         <option value="" >--- CHOICE CATEGORY ---</option>
                         {subCategories}
                     </select>
                 </div>
                 <div className="form-group">
                     <label htmlFor="price">Price</label>
-                    <input className="inputeStyle form-control" type="number" name="price" placeholder="ex: 123" value={price} onChange={(e) => setPrice(e.target.value)}/>
+                    <input className="inputeStyle form-control" type="number" name="price" placeholder="ex: 123" value={price} onChange={(e) => setPrice(e.target.value)} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="price">Promo</label>
-                    <input className="inputeStyle form-control" type="number" name="promo" min="0" max="100" placeholder="0 - 100" value={promo} onChange={(e) => setPromo(e.target.value)}/>
+                    <input className="inputeStyle form-control" type="number" name="promo" min="0" max="100" placeholder="0 - 100" value={promo} onChange={(e) => setPromo(e.target.value)} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="status">Active</label>
-                    <input type="checkbox" className="ml-2" id="status" onChange={() => setStatus(!status)} checked={status}/>
+                    <input type="checkbox" className="ml-2" id="status" onChange={() => setStatus(!status)} checked={status} />
                 </div>
                 <div className="row divBtnSex">
-                    <input type="button" className={`btn btn-ligt mr-5 ${ sex == "F" ? "css-man" : ''}`} id="Women" value="Women" onClick={() => setBtnSex("F") + setSex("F")}/>
-                    <input type="button" className={`btn btn-ligt ${ sex == "H" ? "css-man" : ''}`} id="Men" value="Men" onClick={() => setBtnSex("H") + setSex("H")}/>
+                    <input type="button" className={`btn btn-ligt mr-5 ${sex == "F" ? "css-man" : ''}`} id="Women" value="Women" onClick={() => setBtnSex("F") + setSex("F")} />
+                    <input type="button" className={`btn btn-ligt ${sex == "H" ? "css-man" : ''}`} id="Men" value="Men" onClick={() => setBtnSex("H") + setSex("H")} />
                 </div>
                 <button type="submit" className="btn btn-dark" onClick={formSubmit}>Submit</button>
             </form>

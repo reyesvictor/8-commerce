@@ -19,6 +19,14 @@ class SupplierRepository extends ServiceEntityRepository
         parent::__construct($registry, Supplier::class);
     }
 
+    public function countAllResults()
+    {
+        return $this->createQueryBuilder('u')
+            ->select('count(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     // /**
     //  * @return Supplier[] Returns an array of Supplier objects
     //  */

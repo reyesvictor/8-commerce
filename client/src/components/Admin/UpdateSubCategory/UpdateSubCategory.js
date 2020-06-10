@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import $ from 'jquery';
-import { Parallax,Background } from "react-parallax";
+import { Parallax, Background } from "react-parallax";
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,7 +12,7 @@ function UpdateSubCategory() {
     const [isReady, setIsReady] = useState(false);
     const [name, setName] = useState('');
     const [nameCategory, setNameCategory] = useState('');
-    const lauch = (e) =>{
+    const lauch = (e) => {
         e.preventDefault()
         setIsReady(true);
     }
@@ -22,7 +22,7 @@ function UpdateSubCategory() {
     const token = store.getState().auth.token
     const config = {
         headers: {
-                "Content-type": "application/json"
+            "Content-type": "application/json"
         }
     }
     useEffect(() => {
@@ -32,22 +32,21 @@ function UpdateSubCategory() {
     }, [token]);
 
     useEffect(() => {
-        axios.get("http://localhost:8000/api/category/"+id, config)
-        .then(res => {
-            $.each(res.data.subCategories, (index, category) => {
-                if(category.id === parseInt(idSubCategory))
-                {
-                    console.log(category);
-                    setName(category.name);
-                }
+        axios.get("http://localhost:8000/api/category/" + id, config)
+            .then(res => {
+                $.each(res.data.subCategories, (index, category) => {
+                    if (category.id === parseInt(idSubCategory)) {
+                        console.log(category);
+                        setName(category.name);
+                    }
+                });
+                setNameCategory(res.data.name)
+            })
+            .catch(error => {
+                toast.error('Error !', { position: 'top-center' });
             });
-            setNameCategory(res.data.name)
-        })
-        .catch(error => {
-            toast.error('Error !', {position: 'top-center'});
-        });
     }, [])
-   
+
     useEffect(() => {
         if (isReady) {
             setIsReady(false)
@@ -56,10 +55,10 @@ function UpdateSubCategory() {
                 "name": name
             }
             console.log(body);
-            axios.put("http://127.0.0.1:8000/api/subcategory/"+idSubCategory, body, config).then( e => {
-                toast.success('Product correctly updated!', { position: "top-center"})
-            }).catch( err => {
-                toast.error('Error !', {position: 'top-center'});
+            axios.put("http://127.0.0.1:8000/api/subcategory/" + idSubCategory, body, config).then(e => {
+                toast.success('Product correctly updated!', { position: "top-center" })
+            }).catch(err => {
+                toast.error('Error !', { position: 'top-center' });
             });
         }
     }, [isReady]);
@@ -67,13 +66,15 @@ function UpdateSubCategory() {
     return (
         <div className='container'>
             <ToastContainer />
-            <h1 className="text-center">Update the Subproduct {'id ('+idSubCategory+')'} for <b>{nameCategory}</b> !</h1>
-            <button onClick={() => window.location.href='/admin'} className='float-right btn btn-warning m-2'> Back to Dashboard </button>
-            <button onClick={() => window.location.href='/admin/subcategory/'+id} className='float-right btn btn-info m-2'> Back to the Subcategory </button>
+            <h1 className="text-center">Update the Subproduct {'id (' + idSubCategory + ')'} for <b>{nameCategory}</b> !</h1>
+            <div className="row justify-content-end mb-2">
+                <button onClick={() => window.location.href = '/admin'} className='float-right btn btn-warning m-2'> Back to Dashboard </button>
+                <button onClick={() => window.location.href = '/admin/subcategory/' + id} className='float-right btn btn-info m-2'> Back to the Subcategory </button>
+            </div>
             <form id="formItem">
                 <div className="form-group">
                     <label htmlFor="name">Name</label>
-                    <input className="inputeStyle form-control" type="text" name="name" placeholder="Name category" value={name} onChange={(e) => setName(e.target.value)}/>
+                    <input className="inputeStyle form-control" type="text" name="name" placeholder="Name category" value={name} onChange={(e) => setName(e.target.value)} />
                 </div>
                 <button type="submit" className="btn btn-dark" onClick={(e) => lauch(e)}>Submit</button>
             </form>

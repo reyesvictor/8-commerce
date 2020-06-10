@@ -2,33 +2,25 @@
 
 namespace App\Repository;
 
-use App\Entity\Subproduct;
+use App\Entity\SupplierOrderSubproduct;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Subproduct|null find($id, $lockMode = null, $lockVersion = null)
- * @method Subproduct|null findOneBy(array $criteria, array $orderBy = null)
- * @method Subproduct[]    findAll()
- * @method Subproduct[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method SupplierOrderSubproduct|null find($id, $lockMode = null, $lockVersion = null)
+ * @method SupplierOrderSubproduct|null findOneBy(array $criteria, array $orderBy = null)
+ * @method SupplierOrderSubproduct[]    findAll()
+ * @method SupplierOrderSubproduct[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SubproductRepository extends ServiceEntityRepository
+class SupplierOrderSubproductRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Subproduct::class);
-    }
-
-    public function countAllResults()
-    {
-        return $this->createQueryBuilder('u')
-            ->select('count(u.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        parent::__construct($registry, SupplierOrderSubproduct::class);
     }
 
     // /**
-    //  * @return Subproduct[] Returns an array of Subproduct objects
+    //  * @return SupplierOrderSubproduct[] Returns an array of SupplierOrderSubproduct objects
     //  */
     /*
     public function findByExampleField($value)
@@ -45,7 +37,7 @@ class SubproductRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Subproduct
+    public function findOneBySomeField($value): ?SupplierOrderSubproduct
     {
         return $this->createQueryBuilder('s')
             ->andWhere('s.exampleField = :val')

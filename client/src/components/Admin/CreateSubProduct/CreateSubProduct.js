@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import $ from 'jquery';
-import { Parallax,Background } from "react-parallax";
+import { Parallax, Background } from "react-parallax";
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -19,7 +19,7 @@ function CreateSubProduct() {
     const [titleProduct, setTitleProduct] = useState('');
     const [colors, setColors] = useState([]);
 
-    const lauch = (e) =>{
+    const lauch = (e) => {
         e.preventDefault()
         setIsReady(true);
     }
@@ -28,10 +28,10 @@ function CreateSubProduct() {
     const token = store.getState().auth.token
     const config = {
         headers: {
-                "Content-type": "application/json"
+            "Content-type": "application/json"
         }
     }
-    
+
     useEffect(() => {
         if (token) {
             config.headers['x-auth-token'] = token
@@ -39,20 +39,20 @@ function CreateSubProduct() {
     }, [token]);
 
     useEffect(() => {
-        axios.get("http://localhost:8000/api/product/"+id, config)
-        .then(res => {
-            axios.get("http://127.0.0.1:8000/api/color", config).then( allColors => {
-                let optionColors = [];
-                allColors.data.map(colorMap => {
-                    optionColors.push(<option key={colorMap.id} value={colorMap.id}>{colorMap.name}</option>)
+        axios.get("http://localhost:8000/api/product/" + id, config)
+            .then(res => {
+                axios.get("http://127.0.0.1:8000/api/color", config).then(allColors => {
+                    let optionColors = [];
+                    allColors.data.map(colorMap => {
+                        optionColors.push(<option key={colorMap.id} value={colorMap.id}>{colorMap.name}</option>)
+                    });
+                    setColors(optionColors);
+                    setTitleProduct(res.data.title)
                 });
-                setColors(optionColors);
-                setTitleProduct(res.data.title)
+            })
+            .catch(error => {
+                toast.error('Error !', { position: 'top-center' });
             });
-        })
-        .catch(error => {
-            toast.error('Error !', {position: 'top-center'});
-        });
     }, [])
 
     useEffect(() => {
@@ -68,46 +68,48 @@ function CreateSubProduct() {
                 "stock": parseInt(stock)
             }
             console.log(body);
-            axios.post("http://127.0.0.1:8000/api/subproduct", body, config).then( e => {
-                toast.success('Product correctly added!', { position: "top-center"})
-            }).catch( err => {
-                toast.error(err.data, {position: 'top-center'});
+            axios.post("http://127.0.0.1:8000/api/subproduct", body, config).then(e => {
+                toast.success('Product correctly added!', { position: "top-center" })
+            }).catch(err => {
+                toast.error(err.data, { position: 'top-center' });
             });
         }
     }, [isReady]);
     return (
         <div className='container'>
             <ToastContainer />
-            <h1 className="text-center">Create a new Subproduct for <b>{titleProduct}</b> !</h1>
-            <button onClick={() => window.location.href='/admin'} className='float-right btn-warning'> Back to Dashboard </button>
-            <button onClick={() => window.location.href='/admin/subproduct/'+id} className='float-right btn-info'> Back to the Subproduct </button>
+            <h1 className="text-center">Create a new Subproduct for <br /><b>{titleProduct}</b></h1>
+            <div className="row justify-content-end mb-2">
+                <button onClick={() => window.location.href = '/admin'} className='float-right btn btn-warning m-2'> Back to Dashboard </button>
+                <button onClick={() => window.location.href = '/admin/subproduct/' + id} className='float-right btn btn-info m-2'> Back to the Subproduct </button>
+            </div>
             <form id="formItem">
                 <div className="form-group">
                     <label htmlFor="price">Price</label>
-                    <input className="inputeStyle form-control" type="number" name="price" placeholder="ex: 123" onChange={(e) => setPrice(e.target.value)}/>
+                    <input className="inputeStyle form-control" type="number" name="price" placeholder="Ex: 123" onChange={(e) => setPrice(e.target.value)} />
                 </div>
                 <div className="form-group">
-                <label htmlFor="color">Color</label>
+                    <label htmlFor="color">Color</label>
                     <select name="color" className="form-control form-control-lg" onChange={(e) => setColor(e.target.value)}>
-                            <option value="">--- SELECT COLOR ---</option>
-                            {colors}
+                        <option value="">--- SELECT COLOR ---</option>
+                        {colors}
                     </select>
                 </div>
                 <div className="form-group">
                     <label htmlFor="size">Size</label>
-                    <input className="inputeStyle form-control" type="text" name="size" placeholder="Size article" onChange={(e) => setSize(e.target.value)}/>
+                    <input className="inputeStyle form-control" type="text" name="size" placeholder="Size article" onChange={(e) => setSize(e.target.value)} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="weight">Weight</label>
-                    <input className="inputeStyle form-control" type="number" name="weight" placeholder="ex: 3" onChange={(e) => setWeight(e.target.value)}/>
+                    <input className="inputeStyle form-control" type="number" name="weight" placeholder="ex: 3" onChange={(e) => setWeight(e.target.value)} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="price">Promo</label>
-                    <input className="inputeStyle form-control" type="number" name="promo" min="0" max="100" placeholder="0 - 100" onChange={(e) => setPromo(e.target.value)}/>
+                    <input className="inputeStyle form-control" type="number" name="promo" min="0" max="100" placeholder="0 - 100" onChange={(e) => setPromo(e.target.value)} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="stock">Stock</label>
-                    <input className="inputeStyle form-control" type="number" name="stock" placeholder="ex: 500" onChange={(e) => setStock(e.target.value)}/>
+                    <input className="inputeStyle form-control" type="number" name="stock" placeholder="ex: 500" onChange={(e) => setStock(e.target.value)} />
                 </div>
                 <button type="submit" className="btn btn-dark" onClick={(e) => lauch(e)}>Submit</button>
             </form>

@@ -15,6 +15,7 @@ import {
     Link
   } from "react-router-dom";
 import Product from './components/products/product.details';
+import Panier from './components/panier/panier';
 import Home from './components/home/home';
 import AccessAdmin from './components/Admin/AccessAdmin';
 import NotFound from './components/NotFound/NotFound';
@@ -31,6 +32,7 @@ import SearchSidebar from './components/Search/Sidebar'
 import CreateImageSubproduct from './components/Admin/CreateImage/CreateImageSubproduct';
 import AccessUpdateCategory from './components/Admin/UpdateCategory/AccessUpdateCategory';
 import AccessUpdateSubCategory from './components/Admin/UpdateSubCategory/AccessUpdateSubCategoy';
+import AccessCreateOrder from './components/Admin/CreateOrder/AccessCreateOrder';
 
 
 class App extends React.Component {
@@ -49,9 +51,11 @@ class App extends React.Component {
                 <IndexNavbar />
                     <Switch>
                         <Route exact path="/" component={Home} />
+                        <Route exact path="/panier" component={Panier} />
                         <Route exact path="/product/:id" component={Product} />
                         <Route exact path="/search" component={SearchSidebar} />
                         <Route exact path="/admin" component={AccessAdmin} />
+                        <Route exact path="/admin/order"component={AccessCreateOrder} />
                         <Route exact path="/admin/subcategory/:id"component={AccessSubCategoryInterface} />
                         <Route exact path="/admin/subproduct/:id" component={AccessSubProductInterface} />
                         <Route exact path="/admin/subproduct/:id/create" component={AccessCreateSubProduct} />

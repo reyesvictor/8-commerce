@@ -1,0 +1,24 @@
+.quantity {
+    width: 68% !important;
+}
+
+.btnOrder {
+    width: 25% !important;
+}
+
+h1 {
+    margin-bottom: 50px !important;
+}
+
+.container {
+    padding: 0px 0px 15px 0px !important;
+    border-bottom: 1px solid rgb(226, 226, 226);
+}
+
+#adress, #quantity {
+    padding-top: 20px;
+}
+
+.mtop30 {
+    margin-top: 30px !important;
+}

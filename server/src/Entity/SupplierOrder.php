@@ -5,6 +5,9 @@ namespace App\Entity;
 use App\Repository\SupplierOrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -16,48 +19,64 @@ class SupplierOrder
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"supplierOrders", "supplier_details", "supplier_order_details"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Supplier::class, inversedBy="supplierOrders")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"supplierOrders", "supplier_order_details"})
      */
     private $supplier;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"supplierOrders", "supplier_order_details"})
      */
     private $our_address;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"supplier_details","supplierOrders", "supplier_order_details"})
      */
     private $status;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"supplier_details", "supplierOrders", "supplier_order_details"})
      */
     private $price;
 
     /**
      * @ORM\Column(type="date")
+     * @Groups({"supplier_details", "supplierOrders", "supplier_order_details"})
      */
     private $arrival_date;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"supplier_details", "supplierOrders", "supplier_order_details"})
      */
     private $created_at;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Subproduct::class, inversedBy="supplierOrders")
+     * @ORM\OneToMany(targetEntity=SupplierOrderSubproduct::class, mappedBy="supplierOrder")
+     * @Groups("supplier_order_details")
      */
-    private $subproduct;
+    private $supplierOrderSubproducts;
 
     public function __construct()
     {
-        $this->subproduct = new ArrayCollection();
+        $this->supplierOrderSubproducts = new ArrayCollection();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('our_address', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('price', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('price', new Assert\Type(['type' => ['integer', 'double', 'numeric']]));
+        $metadata->addPropertyConstraint('arrival_date', new Assert\NotBlank());
     }
 
     public function getId(): ?int
@@ -138,26 +157,31 @@ class SupplierOrder
     }
 
     /**
-     * @return Collection|Subproduct[]
+     * @return Collection|SupplierOrderSubproduct[]
      */
-    public function getSubproduct(): Collection
+    public function getSupplierOrderSubproducts(): Collection
     {
-        return $this->subproduct;
+        return $this->supplierOrderSubproducts;
     }
 
-    public function addSubproduct(Subproduct $subproduct): self
+    public function addSupplierOrderSubproduct(SupplierOrderSubproduct $supplierOrderSubproduct): self
     {
-        if (!$this->subproduct->contains($subproduct)) {
-            $this->subproduct[] = $subproduct;
+        if (!$this->supplierOrderSubproducts->contains($supplierOrderSubproduct)) {
+            $this->supplierOrderSubproducts[] = $supplierOrderSubproduct;
+            $supplierOrderSubproduct->setSupplierOrder($this);
         }
 
         return $this;
     }
 
-    public function removeSubproduct(Subproduct $subproduct): self
+    public function removeSupplierOrderSubproduct(SupplierOrderSubproduct $supplierOrderSubproduct): self
     {
-        if ($this->subproduct->contains($subproduct)) {
-            $this->subproduct->removeElement($subproduct);
+        if ($this->supplierOrderSubproducts->contains($supplierOrderSubproduct)) {
+            $this->supplierOrderSubproducts->removeElement($supplierOrderSubproduct);
+            // set the owning side to null (unless already changed)
+            if ($supplierOrderSubproduct->getSupplierOrder() === $this) {
+                $supplierOrderSubproduct->setSupplierOrder(null);
+            }
         }
 
         return $this;

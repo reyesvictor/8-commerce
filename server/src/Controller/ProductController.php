@@ -33,28 +33,6 @@ class ProductController extends AbstractController
     public function index(Request $request, ProductRepository $productRepository, NormalizerInterface $normalizer)
     {
         $count = $productRepository->countResults();
-        $products = $productRepository->findBy([], null, $request->query->get('limit'), $request->query->get('offset'));
-        $products = $normalizer->normalize($products, null, ['groups' => 'products']);
-        $products = array_map(function ($v) {
-            $path = "./images/" . $v['id'] . "/default";
-            if (!is_dir($path)) return $v;
-
-            $imgArray = (array_diff(scandir($path), [".", ".."]));
-            $imgArray = array_map(function ($img) use ($v) {
-                return "/api/image/" . $v['id'] . "/default/$img";
-            }, $imgArray);
-            return array_merge($v, ["images" => array_values($imgArray)]);
-        }, $products);
-
-        return $this->json(['nbResults' => $count, 'data' => $products], 200, [], ['groups' => 'products']);
-    }
-
-    /**
-     * @Route("/api/product/home", name="product_indexHome", methods="GET")
-     */
-    public function indexHome(Request $request, ProductRepository $productRepository, NormalizerInterface $normalizer)
-    {
-        $count = $productRepository->countResults();
         $products = $productRepository->findBy([], array('clicks' => 'DESC'), $request->query->get('limit'), $request->query->get('offset'));
         $products = $normalizer->normalize($products, null, ['groups' => 'products']);
         $products = array_map(function ($v) {
@@ -79,14 +57,22 @@ class ProductController extends AbstractController
         try {
             $jsonContent = $request->getContent();
             $req = json_decode($jsonContent);
-            $product = $serializer->deserialize($jsonContent, Product::class, 'json', [
-                AbstractNormalizer::IGNORED_ATTRIBUTES => ['subcategory', 'subproducts'],
-                ObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true
-            ]);
+
+            try {
+                $product = $serializer->deserialize($jsonContent, Product::class, 'json', [
+                    AbstractNormalizer::IGNORED_ATTRIBUTES => ['subcategory', 'subproducts'],
+                    ObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true
+                ]);
+            } catch (NotNormalizableValueException $e) {
+                return $this->json(['message' => $e->getPrevious()->getMessage()], 400, []);
+            }
+
             if (!isset($req->subcategory)) return $this->json(['message' => 'subcategory missing'], 400, []);
             $subCategory = $this->getDoctrine()
                 ->getRepository(SubCategory::class)
                 ->find($req->subcategory);
+            if (!isset($subCategory)) return $this->json(['message' => 'subcategory not found'], 400, []);
+
             $product->setSubCategory($subCategory);
             $product->setCreatedAt(new DateTime());
 

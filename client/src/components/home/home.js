@@ -16,7 +16,7 @@ function Home() {
     let nbrArctPop = 6;
 
     useEffect(() => {
-        axios.get('http://127.0.0.1:8000/api/product/home?limit='+nbrArctPop).then(resp => {
+        axios.get('http://127.0.0.1:8000/api/product?limit='+nbrArctPop).then(resp => {
             //Display Lowest Price Image
             let prices = {}
             let products_temp = resp.data.data
@@ -90,7 +90,7 @@ function Home() {
                                             {<img className="ProductHomeImg ProductHomeImg2" src={ e.images && e.images.length > 1  ? 'http://127.0.0.1:8000'+e.images[0] : imageDefault}></img>}
                                         </div>
                                     </a>
-                                     <button className='btn-cart'>Add to cart</button>
+                                    <a href={"/product/" + e.id}><button className='btn-cart'>View Product</button></a>
                                      </>
                                     }
                                     {e.images && e.status == false &&
@@ -104,7 +104,7 @@ function Home() {
                                              {/* <img className="ProductHomeImg ProductHomeImg2" src={imageProduit2}></img> */}
                                          </div>
                                      </a>
-                                     <button className='btn-cart unavailable' disabled>Product unavailable</button>
+                                     <a href={"/product/" + e.id}> <button className='btn-cart unavailable' disabled>Product unavailable</button></a>
                                       </>    
                                     }
                                     {!e.images &&
