@@ -48,17 +48,24 @@ class ProductRepository extends ServiceEntityRepository
 
     public function findSearchCategorySubcategory($data)
     {
+        $results = [];
         $conn = $this->getEntityManager()
             ->getConnection();
-        $sql = "SELECT * FROM product 
-        LEFT JOIN subproduct ON product.id = subproduct.product_id 
-        WHERE title REGEXP ? GROUP BY product.id ORDER BY product.clicks DESC LIMIT 5";
-        // OR description REGEXP ?  IF WE WANT TO ADD BY DESCRIPTION AS WELL
+        $sql = "SELECT * FROM category 
+        WHERE name REGEXP ? LIMIT 5";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(1, $data['search'], PDO::PARAM_STR);
-        // $stmt->bindParam(2, $searchString, PDO::PARAM_STR);
         $stmt->execute();
-        return $stmt->fetchAll();
+        array_push($results,['category' => $stmt->fetchAll()]);
+        $conn = $this->getEntityManager()
+            ->getConnection();
+        $sql = "SELECT * FROM sub_category 
+        WHERE name REGEXP ? LIMIT 5";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(1, $data['search'], PDO::PARAM_STR);
+        $stmt->execute();
+        array_push($results,['subcategory' => $stmt->fetchAll()]);
+        return $results;
     }
 
     public function countResults()

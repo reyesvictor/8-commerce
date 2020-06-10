@@ -97,7 +97,7 @@ class SupplierOrderController extends AbstractController
                     $req = json_decode($jsonContent);
 
                     $supplierOrder = $serializer->deserialize($jsonContent, SupplierOrder::class, 'json', [
-                        AbstractNormalizer::IGNORED_ATTRIBUTES => ['subproduct', 'supplier'],
+                        AbstractNormalizer::IGNORED_ATTRIBUTES => ['subproduct', 'supplier', 'status'],
                         AbstractNormalizer::OBJECT_TO_POPULATE => $supplierOrder
                     ]);
                 } catch (NotNormalizableValueException $e) {
@@ -110,6 +110,19 @@ class SupplierOrderController extends AbstractController
                     if (!isset($supplier)) return $this->json(['message' => 'Supplier not found'], 400, []);
                     $supplierOrder->setSupplier($supplier);
                 }
+
+                if(isset($req->status) && $req->status === true && $supplierOrder->getStatus() !== true) {
+                    $supplierOrderSubproduct = $supplierOrder->getSupplierOrderSubproducts();
+                    foreach ($supplierOrderSubproduct as $value) {
+                        $quantity = ($value->getQuantity());
+                        $subprod = ($value->getSubproduct());
+                        $subprod->setStock($subprod->getStock() + $quantity);
+                        $em->persist($subprod);
+                    }
+                    $supplierOrder->setStatus(true);
+                }
+
+                if(isset($req->status) && $req->status === false) $supplierOrder->setStatus(false);
 
                 $error = $validator->validate($supplierOrder);
                 if (count($error) > 0) return $this->json($error, 400);

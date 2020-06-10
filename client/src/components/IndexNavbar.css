@@ -126,8 +126,12 @@
   width: 100%;
 }
 
+.imgcontainer {
+  width: 20%!important;
+}
+
 .productinCart img {
-  height: 4vw;
+  height: 6vw;
   float: left;
 }
 

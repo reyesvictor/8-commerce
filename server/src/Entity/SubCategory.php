@@ -20,25 +20,25 @@ class SubCategory
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"products","category"})
+     * @Groups({"products","category", "subcategory"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="subCategories")
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups("products")
+     * @ORM\JoinColumn(onDelete="CASCADE")  
+     * @Groups({"products", "subcategory"})
      */
     private $Category;
 
     /**
-     * @ORM\OneToMany(targetEntity=Product::class, mappedBy="subCategory")
+     * @ORM\OneToMany(targetEntity=Product::class, mappedBy="subCategory",orphanRemoval=true, cascade={"persist", "remove"}))
      */
     private $Product;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"products","category"})
+     * @Groups({"products","category", "subcategory"})
      */
     private $name;
 

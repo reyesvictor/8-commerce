@@ -1,8 +1,6 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -257,9 +255,8 @@ code {
 /*-------- Large Panier ------ */
 
 .LargeCart {
-  width: 60%;
-  margin: 0 auto;
-  margin-bottom: 10vw !important;
+  width: 70%;
+  margin: 3vw auto;
 }
 
 .LargeCart .total {
@@ -290,4 +287,22 @@ code {
     max-width: 100% !important;
     width: 100% !important;
   }
+}
+
+.supbtn,.buttonreset {
+  position: absolute;
+  right: 1em;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  background-color: none!important;
+  border: none;
+}
+
+.productcarttitle {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  white-space: nowrap;
 }

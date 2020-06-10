@@ -9,23 +9,39 @@ import 'react-toastify/dist/ReactToastify.css';
 function Suppliers() {
     const [show, setShow] = useState(false);
     const [supplierName, setSupplierName] = useState([]);
-    const [show2, setShow2] = useState(false);
-    const [idSupplier, setIdSupplier] = useState([]);
-    const [ourAdress, setOurAdress] = useState([]);
-    const [price, setPrice] = useState([]);
-    const [quantity, setQuantity] = useState([]);
     const [allSupplier, setAllSupplier] = useState([]);
-    const [isReady, setIsReady] = useState(false);
+    const [postDataOrder, setPostDataOrder] = useState([]);
+    const [showDetails, setShowDetails] = useState(false);
     const optionSelect = [];
+    const [divOrder, setDivOrder] = useState([]);
 
     const config = {
         headers: {
             "Content-type": "application/json"
         }
-    }
+    };
     useEffect(() => {
         axios.get("http://127.0.0.1:8000/api/supplier", config).then(e => {
             setAllSupplier(e.data.data);
+        });
+    }, []);
+
+    useEffect(() => {
+        axios.get("http://127.0.0.1:8000/api/supplier/order", config).then(e => {
+            console.log(e.data.data)
+            const newPostDataOrder = e.data.data.map((order) =>
+                <tr key={order.id}>
+                    <td><p className="myMargin align-items-center">{order.id}</p></td>
+                    <td><p className="myMargin">{order.our_address}</p></td>
+                    <td><p className="myMargin">{order.price}</p></td>
+                    <td><button onClick={e => e.preventDefault() + showDetailsOrder(order.id)} className="btn btn-outline-dark m-1">View</button></td>
+                    {order.status == false ?
+                        <td><button className="btn btn-outline-success m-1">Mark as arrived</button></td> :
+                        <td><button className="btn btn-outline-success m-1 disabled" disabled>Arrived ✅</button></td>
+                    }
+                </tr>
+            )
+            setPostDataOrder(newPostDataOrder);
         });
     }, []);
 
@@ -33,75 +49,6 @@ function Suppliers() {
         optionSelect.push(<option key={supp.id} value={supp.id}>{supp.name}</option>)
     });
 
-    const [isInvalid, setIsInvalid] = useState(false);
-    const onChangeAdress = (event) => {
-        let res = event.target.value.trim();
-        setOurAdress(res.replace(/[\s]{2,}/g, " "));
-    }
-    const onChangePrice = (event) => {
-        setPrice(event.target.value);
-    }
-    const onChangeQty = (event) => {
-        setQuantity(event.target.value);
-    }
-    function onSubmit2(e) {
-        e.preventDefault();
-        let invalids = {};
-
-        if (idSupplier == "") {
-            invalids.idsupplier = "PLease select a supplier";
-        }
-        if (ourAdress != "") {
-            if (ourAdress.match(/[\\'"/!$%^&*()_+|~=`{}[:;<>?,.@#\]]/)) {
-                invalids.adress = "Invalids charactere";
-            }
-        } else {
-            invalids.adress = "PLease enter adress";
-        }
-        if (price.length == 0) {
-            invalids.price = "PLease enter price";
-        }
-        if (quantity.length == 0) {
-            invalids.quantity = "PLease enter quantity";
-        }
-
-        if (Object.keys(invalids).length === 0) {
-            setIsInvalid(invalids);
-            setIsReady(true);
-        } else {
-            setIsInvalid(invalids);
-        }
-    }
-
-    const Shipping = (days) => {
-        var result = new Date();
-        result.setDate(result.getDate() + days);
-        let dd = result.getDate();
-        let mm = result.getMonth();
-        let yy = result.getFullYear();
-        let date = dd + "/" + mm + "/" + yy;
-        return date;
-    }
-
-    useEffect(() => {
-        if (isReady) {
-            const body = {
-                "our_address" : ourAdress,
-                "status" : false,
-                "price" : price,
-                "arrival_date" : Shipping(3),
-                "supplier_id" : idSupplier
-            }
-            axios.post("http://127.0.0.1:8000/api/supplier/order", body, config).then( e => {
-                setIsReady(false);
-                toast.success('Product correctly added!', { position: "top-center"});
-            }).catch( err => {
-                toast.error('Error !', {position: 'top-center'});
-            });
-        }
-    }, [isReady]);
-
-//-------------------- SUPPLIER NAME ------------------------
     const onChange = (event) => {
         let res = event.target.value.trim();
         let str = res.toLowerCase();
@@ -118,7 +65,7 @@ function Suppliers() {
         } else {
             const body = {
                 "name" : supplierName
-            }
+            };
             axios.post("http://127.0.0.1:8000/api/supplier", body, config).then( e => {
                 toast.success("Supplier correctly added !", { position: "top-center" });
                 setShow(false);
@@ -128,50 +75,20 @@ function Suppliers() {
         }
     }
 
+    function showDetailsOrder(id) {
+        axios.get("http://127.0.0.1:8000/api/supplier/order/" + id, config).then(res => {
+            setDivOrder(res.data.supplierOrderSubproducts)
+            setShowDetails(true);
+        }).catch(error => {
+            console.log(error);
+        });
+    }
+    
     return (
         <>
             <ToastContainer />
             <div className="row justify-content-end mb-2">
                 <button onClick={() => window.location.href = 'admin/order'} className="btn btn-success m-1">+ New Order</button>
-                <Modal show={show2} onHide={() => setShow2(false)}>
-                    <Modal.Header closeButton>New Order !</Modal.Header>
-                    <Modal.Body>
-                        <Form onSubmit={onSubmit2}>
-                            <FormGroup>
-                                <select className={"form-control form-control-sm " + (isInvalid.idsupplier ? 'is-invalid' : 'inputeStyle')} onChange={e => setIdSupplier(e.target.value)}>
-                                    <option value="">---SELECT SUPPLIER---</option>
-                                    {optionSelect}
-                                </select>
-                                <div className="invalid-feedback">{ isInvalid.idsupplier }</div>
-                                <Label for="supplier">Our adress</Label>
-                                <Input
-                                    type="text"
-                                    name="adress"
-                                    id="adress"
-                                    className={(isInvalid.adress ? 'is-invalid' : 'inputeStyle')}
-                                    onChange={onChangeAdress}/>
-                                    <div className="invalid-feedback">{ isInvalid.adress }</div>
-                                <Label for="Price">Price</Label>
-                                <Input
-                                    type="number"
-                                    name="price"
-                                    id="price"
-                                    className={(isInvalid.price ? 'is-invalid' : 'inputeStyle')}
-                                    onChange={onChangePrice}/>
-                                    <div className="invalid-feedback">{ isInvalid.price }</div>
-                                <Label for="quantity">Quantity</Label>
-                                <Input
-                                    type="number"
-                                    name="quantity"
-                                    id="quantity"
-                                    className={(isInvalid.quantity ? 'is-invalid' : 'inputeStyle')}
-                                    onChange={onChangeQty}/>
-                                    <div className="invalid-feedback">{ isInvalid.quantity }</div>
-                                <Button color="dark" className="mt-4" block>Submit</Button>
-                            </FormGroup>
-                        </Form>
-                    </Modal.Body>
-                </Modal>
                 <button onClick={() => setShow(true)} className="btn btn-success m-1">+ New Supplier</button>
                 <Modal show={show} onHide={() => setShow(false)}>
                     <Modal.Header closeButton>New Supplier !</Modal.Header>
@@ -189,17 +106,50 @@ function Suppliers() {
                         </Form>
                     </Modal.Body>
                 </Modal>
+                <Modal show={showDetails} onHide={() => setShowDetails(false)}>
+                    <Modal.Header closeButton>New Supplier !</Modal.Header>
+                    <Modal.Body>
+                        {divOrder.length > 0 &&
+                        divOrder.map( subProduct => 
+                            <div className="divOrderCart" key={subProduct.subproduct.id}>
+                                <table className="productinCart">
+                                    <tbody>
+                                        <tr>
+                                            <td rowSpan="3" className="tableborder">
+                                                <img src="http://127.0.0.1:8000/api/image/2/default/1.jpg"/>
+                                            </td>
+                                            <td>
+                                                <span><b>Title:</b> { subProduct.subproduct.product.title}</span>
+                                            </td>
+                                        </tr>
+                                        <tr className="tableborder">
+                                            <td className="detailsproduct">
+                                                <span><b>ID:</b> {subProduct.subproduct.id}</span>
+                                                <span><b>Color:</b> {subProduct.subproduct.color.name}</span>
+                                                <span><b>Size:</b> {subProduct.subproduct.size}</span>
+                                                <span><b>Quantity:</b> {subProduct.quantity}</span>
+                                                <span><b>Price:</b> {subProduct.subproduct.price}</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    <Button color="dark" className="mt-4" block onClick={() => setShowDetails(false)}>Close</Button>
+                    </Modal.Body>
+                </Modal>
             </div>
             <div className="row border p-2">
                 <table>
                     <thead>
                         <tr>
-                            <th><p className="m-2 align-items-center"> ID </p></th>
-                            <th><p className="m-2"> Order </p></th>
-                            <th><p colspan="3" className="m-1"> Actions </p></th>
+                            <th><p className="myMargin align-items-center"> ID </p></th>
+                            <th><p className="myMargin"> Order </p></th>
+                            <th><p className="myMargin"> Price </p></th>
+                            <th><p className="myMargin" colspan="3" className="m-1"> Actions </p></th>
                         </tr>
                     </thead>
-                    {/* <tbody>{postDataCategories}</tbody> */}
+                    <tbody>{postDataOrder}</tbody>
                 </table>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center' }}>

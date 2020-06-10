@@ -44,7 +44,9 @@ export default class SearchSidebar extends Component {
 
       isResultsReady: false,
 
-      searchValue: null
+      searchValue: null,
+
+      resultExist: true,
     };
 
     this.handleSearch = this.handleSearch.bind(this);
@@ -59,7 +61,9 @@ export default class SearchSidebar extends Component {
     this.handleSortBy = this.handleSortBy.bind(this);
     this.showFilter = this.showFilter.bind(this);
     this.checkEmptyArray = this.checkEmptyArray.bind(this);
+    this.checkNull = this.checkNull.bind(this);
     this.showFilter = this.showFilter.bind(this);
+    // this.checkIfCatsubcatExists = this.checkIfCatsubcatExists.bind(this);
   }
 
   handleSearch(e) {
@@ -129,11 +133,11 @@ export default class SearchSidebar extends Component {
       .get("http://localhost:8000/api/category/")
       .then(async (res) => {
         console.log(res.data.data);
-        await this.setState({ categories: res.data.data, isCategoryReady: true, isResultsReady: false });
+        await this.setState({ categories: res.data.data, subcategory: null, isCategoryReady: true });
 
         res.data.data.map(cat => {
           if ( this.state.category == cat.name ) {
-            this.setState({ subcategories: cat.subCategories, isCategoryReady: true });
+            this.setState({ subcategories: cat.subCategories, isSubCategoryReady: true });
           }
         })
       })
@@ -186,6 +190,12 @@ export default class SearchSidebar extends Component {
     }
   }
 
+  checkNull(value) {
+    if (value == ''){
+      return true;
+    }
+  }
+
   handleSubmit(e) {
     let jsonRequest = {
       price: {
@@ -195,8 +205,8 @@ export default class SearchSidebar extends Component {
       sex: this.state.sexe,
       size: this.checkEmptyArray(this.state.size),
       color: this.checkEmptyArray(this.state.color),
-      subcategory: this.state.subcategory,
-      category: this.state.category,
+      subcategory: this.checkNull(this.state.subcategory) ? null : this.state.subcategory,
+      category: this.checkNull(this.state.category) ? null : this.state.category,
       order_by: this.state.orderBy.toLowerCase(),
       order_by_sort: this.state.sortBy,
       search: this.state.searchValue
@@ -230,37 +240,111 @@ export default class SearchSidebar extends Component {
     this.setState({ showFilter: !this.state.showFilter });
   }
 
+  // checkIfCatsubcatExists(catsubcat) {
+  //   console.log(catsubcat)
+  //   axios
+  //   .post("http://localhost:8000/api/product/search", { search: catsubcat }, { "Content-Type": "application/json" })
+  //   .then(async (res) => {
+  //     console.log(res.data.catsubcat);
+      
+  //       if (
+  //         res.data.catsubcat[0].category.length < 1 ||
+  //         res.data.catsubcat[1].subcategory.length < 1
+  //       ) {
+  //         await this.setState({subcategory: null, category: null})
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.log(error.response);
+  //     });
+  // }
+
   componentDidMount() {
     let paramsURL = this.props.location.search.substr(1).split("=")
 
+    // this.checkIfCatsubcatExists(paramsURL[1])
+
     if (paramsURL[0] == "subcategory") {
       this.defaultValueSubCategory(paramsURL[1])
-      // $('select option[value="null"]').prop('selected',false);
       console.log(paramsURL[1])
+
+      axios
+      .get("http://localhost:8000/api/subcategory/")
+      .then(async (res) => {
+        console.log(res.data);
+
+        await res.data.map( async subcat => {
+          // console.log(subcat)
+          if ( this.state.subcategory == subcat.name ) {
+            await this.setState({ 
+              subcategories: [{id: subcat.id, name: subcat.name}], 
+              category: subcat.Category.name
+              // categories: [{name: subcat.Category.name, id: subcat.Category.id 
+              });
+          }
+        })
+      })
+      .catch((error) => {
+        console.log(error.response);
+      });
+
+      axios
+        .get("http://localhost:8000/api/category/")
+        .then(async (res) => {
+          console.log(res.data.data);
+          await this.setState({ categories: res.data.data, isCategoryReady: true });
+
+          this.setState({isSubCategoryReady: true })
+        })
+        .catch((error) => {
+          console.log(error.response);
+        });
+
     }
+
     else if (paramsURL[0] == "category") {
       this.defaultValueCategory(paramsURL[1])
+      
+      axios
+      .get("http://localhost:8000/api/category/")
+      .then(async (res) => {
+        console.log(res.data.data);
+        await this.setState({ categories: res.data.data, isCategoryReady: true });
+
+        res.data.data.map(cat => {
+          if ( this.state.category == cat.name ) {
+            this.setState({ subcategories: cat.subCategories, isSubCategoryReady: true });
+          }
+        })
+      })
+      .catch((error) => {
+        console.log(error.response);
+      });
+    }
+    else {
+      axios
+        .get("http://localhost:8000/api/subcategory/")
+        .then((res) => {
+          console.log(res.data);
+          this.setState({ subcategories: res.data, isSubCategoryReady: true });
+        })
+        .catch((error) => {
+          console.log(error.response);
+        });
+  
+      axios
+        .get("http://localhost:8000/api/category/")
+        .then((res) => {
+          console.log(res.data.data);
+          this.setState({ categories: res.data.data, isCategoryReady: true });
+        })
+        .catch((error) => {
+          console.log(error.response);
+        });
     }
 
-    axios
-      .get("http://localhost:8000/api/subcategory/")
-      .then((res) => {
-        console.log(res.data);
-        this.setState({ subcategories: res.data, isSubCategoryReady: true });
-      })
-      .catch((error) => {
-        console.log(error.response);
-      });
 
-    axios
-      .get("http://localhost:8000/api/category/")
-      .then((res) => {
-        console.log(res.data.data);
-        this.setState({ categories: res.data.data, isCategoryReady: true });
-      })
-      .catch((error) => {
-        console.log(error.response);
-      });
+
 
     axios
       .get("http://localhost:8000/api/color/")
@@ -271,14 +355,6 @@ export default class SearchSidebar extends Component {
       .catch((error) => {
         console.log(error.response);
       });
-
-
-      // $('select option:contains("Handbags")').prop('selected',true);
-
-      // $('#sel1 option').filter(function() { 
-      //   return ($(this).val() == 'Handbags');
-      // }).prop('selected', true);
-      
   }
 
   async defaultValueSubCategory(value) {
@@ -292,15 +368,12 @@ export default class SearchSidebar extends Component {
   }
 
   render() {
-    const isReady =  this.state.isCategoryReady && this.state.isColorsReady;
-
+    const isCategoryReady = this.state.isCategoryReady
+    const isColorReady = this.state.isColorsReady;
     const isSubCategoriesReady = this.state.isSubCategoryReady;
 
     const sortChecked = this.state.sortBy;
-
     const results = this.state.results;
-
-    const subcategoryDefault = this.state.subcategory
 
     return (
       <div className="container">
@@ -387,7 +460,7 @@ export default class SearchSidebar extends Component {
                 </div>
               </div>
 
-              {/* Gender */}
+              {/* Size */}
               <div className="form-group row">
                 <span className="mr-5">Size</span>
                 <div className="form-check form-check-inline">
@@ -468,7 +541,7 @@ export default class SearchSidebar extends Component {
               <div className="form-group row">
                 <span className="mr-5">Color</span>
 
-                {isReady
+                {isColorReady
                     ? this.state.colors.map((color) => (
                       <div className="form-check form-check-inline" key={color.id}>
                         <input
@@ -501,7 +574,7 @@ export default class SearchSidebar extends Component {
                   
                   <option defaultValue="null"></option>
 
-                  {isReady
+                  {isCategoryReady
                     ? 
                     this.state.categories.map((category) => (
                       <option key={category.id} value={category.name} >
@@ -524,7 +597,7 @@ export default class SearchSidebar extends Component {
                   onChange={this.handleSubCategory}
                 >
 
-                  <option defaultValue="null"></option>
+                  <option value={null}></option>
 
                   {isSubCategoriesReady
                     ? 

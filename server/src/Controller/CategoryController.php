@@ -7,7 +7,7 @@ use App\Entity\SubCategory;
 use App\Repository\ImageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use App\Repository\CategoryRepository;
-use App\Repository\SubcategoryRepository;
+use App\Repository\SubCategoryRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -93,7 +93,7 @@ class CategoryController extends AbstractController
     }
 
       /**
-     * @Route("/api/category/{id}", name="category_update", methods="PUT")
+     * @Route("/api/category/{id}", name="category_update", methods="PUT",requirements={"id":"\d+"})
      */
     public function categoryUpdate(Request $request, EntityManagerInterface $em, ValidatorInterface $validator, CategoryRepository $categoryRepository)
     {
@@ -128,6 +128,33 @@ class CategoryController extends AbstractController
     {
         $result = $categoryRepository->findSearchResult($request->attributes->get('search'), $request->query->get('limit'), $request->query->get('offset'));
         return $this->json($result);
+    }
+
+    /**
+     * @Route("/api/category/migrate", name="category_migrate", methods="PUT")
+     */
+    public function categoryMigrate(Request $request, EntityManagerInterface $em,SubCategoryRepository $subcategory,CategoryRepository $categoryrepo)
+    {
+        $jsonContent = $request->getContent();
+        $req = json_decode($jsonContent);
+
+        $subcategories = $subcategory->findBy(['Category' => $req->oldcategory]);
+        if(!$subcategories){
+            return $this->json(['message' => 'SubCategory not found for this Id'], 404);
+        }
+        $newcategory = $categoryrepo->findOneBy(['id' => $req->newcategory]);
+        if(!$newcategory){
+            return $this->json(['message' => 'Category not found for this Id'], 404);
+        }
+
+        foreach($subcategories as $subcategory){ 
+            $subcategory->setCategory($newcategory);
+            $em->persist($subcategory);
+        }
+
+        $em->flush();
+
+        return $this->json(['message' => 'Subcategory/s has been successfully migrated'],200);
     }
 
 }

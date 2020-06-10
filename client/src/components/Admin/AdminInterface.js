@@ -238,11 +238,11 @@ const AdminInterface = () => {
             const body = {
                 "name": categoryNameEdit,
             }
-            axios.put("http://localhost:8000/api/category/"+cateEditId, body, config ).then( e => {
-                toast.success('Category correctly updated!', { position: "top-center"});
+            axios.put("http://localhost:8000/api/category/" + cateEditId, body, config).then(e => {
+                toast.success('Category correctly updated!', { position: "top-center" });
                 setShowCateEdit(false);
-            }).catch( err => {
-                toast.error('Error !', {position: 'top-center'});
+            }).catch(err => {
+                toast.error('Error !', { position: 'top-center' });
             });
         }
     }
@@ -336,7 +336,7 @@ const AdminInterface = () => {
 
     function onSubmitCate(e) {
         e.preventDefault();
-        
+
         if (categoryName.length === 0) {
             return toast.error("You need to enter a category", { position: "top-center" });
         }
@@ -347,10 +347,10 @@ const AdminInterface = () => {
             const body = {
                 "name": categoryName
             }
-            axios.post("http://127.0.0.1:8000/api/category/create/" + categoryName, body, config).then( res => {
-                toast.success('Category correctly added!', {position: "top-center"});
-            }).catch( err => {
-                toast.error('Category already exist!', {position: 'top-center'});
+            axios.post("http://127.0.0.1:8000/api/category/create/" + categoryName, body, config).then(res => {
+                toast.success('Category correctly added!', { position: "top-center" });
+            }).catch(err => {
+                toast.error('Category already exist!', { position: 'top-center' });
             });
             setShowCate(false);
         }
@@ -360,25 +360,33 @@ const AdminInterface = () => {
         return (
             <>
                 <div className="row justify-content-end mb-2">
-                    <button onClick={handleShowCate} className="btn btn-success m-1">+ New Category</button>
-                        <Modal show={showCate} onHide={handleCloseCate}>
-                            <Modal.Header closeButton>Create category !</Modal.Header>
-                            <Modal.Body>
-                                <Form onSubmit={onSubmitCate}>
-                                    <FormGroup>
-                                        <Label for="category">Category name</Label>
-                                        <Input
-                                            type="text"
-                                            name="category"
-                                            id="category"
-                                            onChange={onChangeCate}
-                                        />
-                                        <Button color="dark" className="mt-4" block>Submit</Button>
-                                    </FormGroup>
-                                </Form>
-                            </Modal.Body>
-                        </Modal>
-                    <button onClick={() => redirectCreate('subcategory')} className="btn btn-success m-1">+ New SubCategory</button>
+                    <button onClick={handleShowCate} className="btn btn-success m-1">
+                        + New Category
+                    </button>
+                    <Modal show={showCate} onHide={handleCloseCate}>
+                        <Modal.Header closeButton>
+                            Create category !
+                            </Modal.Header>
+                        <Modal.Body>
+                            <Form onSubmit={onSubmitCate}>
+                                <FormGroup>
+                                    <Label for="category">Category name</Label>
+                                    <Input
+                                        type="text"
+                                        name="category"
+                                        id="category"
+                                        onChange={onChangeCate}
+                                    />
+                                    <Button color="dark" className="mt-4" block>
+                                        Submit
+                                        </Button>
+                                </FormGroup>
+                            </Form>
+                        </Modal.Body>
+                    </Modal>
+                    <button onClick={() => redirectCreate('subcategory')} className="btn btn-success m-1">
+                        + New SubCategory
+                    </button>
                 </div>
                 <div className="row border p-2">
                     <table>
@@ -571,14 +579,14 @@ const AdminInterface = () => {
         <div className="container adminTable">
             <ToastContainer />
             <h1 className="mb-5">
-                <i class="material-icons md-36">speed</i> ADMIN - Dashboard
+                <i class="material-icons md-36 marg">speed</i> ADMIN - Dashboard
             </h1>
             <Tabs forceRenderTabPanel={true}>
                 <TabList className="tabsHolder" style={{ paddingLeft: 0 }}>
-                    <Tab><h3 className="tabtitles mr-3 ml-3">Products</h3></Tab>
-                    <Tab><h3 className="tabtitles mr-3 ml-3">Categories</h3></Tab>
-                    <Tab><h3 className="tabtitles mr-3 ml-3">Colors</h3></Tab>
-                    <Tab><h3 className="tabtitles mr-3 ml-3">Suppliers</h3></Tab>
+                    <Tab><h3 className="tabtitles mr-3 ml-3"><i class="material-icons md-36 marg">source</i>Products</h3></Tab>
+                    <Tab><h3 className="tabtitles mr-3 ml-3"><i class="material-icons md-36 marg">collections</i>Categories</h3></Tab>
+                    <Tab><h3 className="tabtitles mr-3 ml-3"><i class="material-icons md-36 marg">color_lens</i>Colors</h3></Tab>
+                    <Tab><h3 className="tabtitles mr-3 ml-3"><i class="material-icons md-36 marg">local_shipping</i>Suppliers</h3></Tab>
                 </TabList>
                 <TabPanel>
                     {AllProducts()}
