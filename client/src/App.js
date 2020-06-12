@@ -19,8 +19,8 @@ import Panier from './components/panier/panier';
 import Home from './components/home/home';
 import AccessAdmin from './components/Admin/AccessAdmin';
 import NotFound from './components/NotFound/NotFound';
-import AccessCreateCategory from './components/Admin/CreateCategory/AccessCreateCategory';
-import AccessCreateSubCategory from './components/Admin/CreateCategorySub/AccessCreateSubCategory';
+// import AccessCreateCategory from './components/Admin/CreateCategory/AccessCreateCategory';
+// import AccessCreateSubCategory from './components/Admin/CreateCategorySub/AccessCreateSubCategory';
 import AccessCreateProduct from './components/Admin/CreateProduct/AccessCreateProduct';
 import AccessUpdateProduct from './components/Admin/UpdateProduct/AccessUpdateProduct';
 import AccessCreateSubProduct from './components/Admin/CreateSubProduct/AccessCreateSubProduct';
@@ -44,8 +44,6 @@ class App extends React.Component {
     render() {
         console.log(store.getState().auth);
         return (
-            //<Product />
-            
             <Provider store={store}>
                 <Router>
                 <IndexNavbar />
@@ -61,8 +59,8 @@ class App extends React.Component {
                         <Route exact path="/admin/subproduct/:id/create" component={AccessCreateSubProduct} />
                         <Route exact path="/admin/subproduct/:id/:subproduct/update" component={AccessUpdateSubProduct} />
                         <Route exact path="/admin/create/product" component={AccessCreateProduct} />
-                        <Route exact path="/admin/create/category" component={AccessCreateCategory} />
-                        <Route exact path="/admin/create/subcategory" component={AccessCreateSubCategory} />
+                        {/* <Route exact path="/admin/create/category" component={AccessCreateCategory} />
+                        <Route exact path="/admin/create/subcategory" component={AccessCreateSubCategory} /> */}
                         <Route exact path="/admin/create/image/:idproduct" component={CreateImage} />
                         <Route exact path="/admin/create/image/:idproduct/:idsubproduct" component={CreateImageSubproduct} />
                         <Route exact path="/admin/update/product/:id" component={AccessUpdateProduct} />
@@ -71,7 +69,6 @@ class App extends React.Component {
                     </Switch>
                 </Router>
             </Provider>
-        
         )
     }
 }

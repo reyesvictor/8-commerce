@@ -6,13 +6,35 @@ import { ToastContainer, toast } from 'react-toastify';
 
 function Cart(props) {
     const [isInvalid, setIsInvalid] = useState(false);
+    const [countProps, setCountProps] = useState(0);
+    const [divOrder, setDivOrder] = useState([]);
     const nbrProduct = [];
     const nbrPrice = [];
-    const divOrder = [];
     let sumProduct = 0;
     let sumPrice = 0;
-    
+    const config = {
+        headers: {
+            "Content-type": "application/json"
+        }
+    };
     const supplierOrder = [];
+
+    useEffect(() => {
+        if(props.handleCart && props.handleCart.length !== countProps) {
+        let nbr = countProps + 1;
+            setCountProps(nbr);
+        }
+    }, [props.handleCart]);
+
+    useEffect(() => {
+        renderProduct();
+    }, [countProps]);
+
+    useEffect(() => {
+        if (props.handleCart.length == 0) {
+            setDivOrder([]);
+        }
+    }, [props.handleCart]);
 
     const Shipping = (days) => {
         var result = new Date();
@@ -22,10 +44,8 @@ function Cart(props) {
         let yy = result.getFullYear();
         let date = dd + "-" + mm + "-" + yy;
         return date;
-    }
-
-    props.handleCart.map((e) => {
-        console.log(e);
+    };
+    props.handleCart.map(e => {
         let obj = {
             "idColor": e.idColor,
             "idProduct": e.idProduct,
@@ -40,41 +60,38 @@ function Cart(props) {
         supplierOrder.push(obj);
         nbrProduct.push(e.quantity);
         nbrPrice.push(e.quantity * e.price);
-        
-        divOrder.push(
-            <div className="divOrderCart" key={e.idSubProduct}>
-                <table className="productinCart">
-                    <tbody>
-                        <tr>
-                            <td rowSpan="3" className="tableborder">
-                                <img src="http://127.0.0.1:8000/api/image/2/default/1.jpg"/>
-                            </td>
-                            <td>
-                                <span><b>Title:</b> { e.subProductTitle}</span>
-                            </td>
-                        </tr>
-                        <tr className="tableborder">
-                            <td className="detailsproduct">
-                                <span><b>ID:</b> {e.idSubProduct}</span>
-                                <span><b>Color:</b> {e.subProductColor}</span>
-                                <span><b>Size:</b> {e.subProductSize}</span>
-                                <span><b>Quantity:</b> {e.quantity}</span>
-                                <span><b>Price:</b> {e.price * e.quantity}</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        );
-    })
-
+    });
+    const renderProduct = () => {
+        props.handleCart.map((e) => {
+            setDivOrder([...divOrder,
+                <div className="divOrderCart" key={countProps}>
+                    <table className="productinCart">
+                        <tbody>
+                            <tr>
+                                <td rowSpan="3" className="tableborder paddright">
+                                    <img className="imgOrder" src={`http://127.0.0.1:8000/api/image/${e.idProduct}/default/1.jpg`}/>
+                                </td>
+                                <td>
+                                    <span><b>Title:</b> { e.subProductTitle}</span>
+                                </td>
+                            </tr>
+                            <tr className="tableborder">
+                                <td className="detailsproduct">
+                                    <span><b>ID:</b> {e.idSubProduct}</span>
+                                    <span><b>Color:</b> {e.subProductColor}</span>
+                                    <span><b>Size:</b> {e.subProductSize}</span>
+                                    <span><b>Quantity:</b> {e.quantity}</span>
+                                    <span><b>Price:</b> {e.price * e.quantity} €</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            ]);    
+        })
+    }
     const submitOrder = (priceOrder) => {
         let invalids = {};
-        const config = {
-            headers: {
-                "Content-type": "application/json"
-            }
-        };
         let obj = {
             "our_address" : props.ourAdress,
             "status" : false,
@@ -90,14 +107,17 @@ function Cart(props) {
             } else {
                 setIsInvalid(invalids);
                 axios.post("http://127.0.0.1:8000/api/supplier/order", obj, config).then( res => {
-                    toast.success('Order correctly submited !', { position: "top-center"});
+                    let count = 0;
                     supplierOrder.map(order => {
                         const body = {
                             "subproduct_id" : order.subproduct_id,
                             "quantity" : order.quantity
                         };
                         axios.post(`http://127.0.0.1:8000/api/supplier/order/${res.data.SupplierOrder.id}/add`, body, config).then(e => {
-                            console.log(e);
+                            count++;
+                            if (count == supplierOrder.length) {
+                                window.location.reload();
+                            }
                         }).catch(error => {
                             console.log(error);
                         });
@@ -115,7 +135,7 @@ function Cart(props) {
     if (props.handleCart.length > 0) {
         return (
             <>
-                <div className="container mb-5">
+                <div className="container mb-5" key={countProps}>
                     <ToastContainer />
                     {divOrder}
                     <div className="total">

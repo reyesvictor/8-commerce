@@ -1,0 +1,15 @@
+.grid-body {
+  /* display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  order: 3; */
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
+
+.grid-item {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}

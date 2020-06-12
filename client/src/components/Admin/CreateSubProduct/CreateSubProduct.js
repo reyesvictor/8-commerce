@@ -5,7 +5,9 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouteMatch } from "react-router-dom";
+import CreateColorModal from '../Color/CreateColorModal';
 import './CreateSubProduct.css';
+import Modal from 'react-bootstrap/Modal';
 import store from '../../../store';
 
 function CreateSubProduct() {
@@ -24,6 +26,10 @@ function CreateSubProduct() {
         setIsReady(true);
     }
     let id = useRouteMatch("/admin/subproduct/:id/create").params.id;
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
     const token = store.getState().auth.token
     const config = {
@@ -31,7 +37,7 @@ function CreateSubProduct() {
             "Content-type": "application/json"
         }
     }
-
+    
     useEffect(() => {
         if (token) {
             config.headers['x-auth-token'] = token
@@ -53,7 +59,7 @@ function CreateSubProduct() {
             .catch(error => {
                 toast.error('Error !', { position: 'top-center' });
             });
-    }, [])
+    }, [show])
 
     useEffect(() => {
         if (isReady) {
@@ -94,6 +100,7 @@ function CreateSubProduct() {
                         <option value="">--- SELECT COLOR ---</option>
                         {colors}
                     </select>
+                    <a className='text-info small' style={{ cursor:'pointer' }} variant="primary" onClick={handleShow}> Create a new Color ? </a>
                 </div>
                 <div className="form-group">
                     <label htmlFor="size">Size</label>
@@ -113,6 +120,9 @@ function CreateSubProduct() {
                 </div>
                 <button type="submit" className="btn btn-dark" onClick={(e) => lauch(e)}>Submit</button>
             </form>
+            <Modal show={show} onHide={handleClose}>
+                <CreateColorModal />
+            </Modal>
         </div>
     )
 }

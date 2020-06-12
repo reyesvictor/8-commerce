@@ -170,7 +170,6 @@ const SubProductInterface = () => {
                 <button onClick={redirectCreate} className="btn btn-success m-2">
                     + New Subproduct for <b>{titleProduct}</b>
                 </button>
-                <button onClick={() => window.location.href = '/admin/update/product/' + id} className='btn btn-outline-info m-2'> Modify {titleProduct} </button>
             </div>
             <div className="row border p-2">
                 <table>
@@ -182,7 +181,7 @@ const SubProductInterface = () => {
                                 <th><p className="m-2"> Color </p></th>
                                 <th><p className="m-2"> Size </p></th>
                                 <th><p className="m-2"> Weight </p></th>
-                                <th><p className="m-2" colspan="3"> Actions </p></th>
+                                <th><p className="m-2" colSpan="3"> Actions </p></th>
                             </tr>
                         }
                     </thead>
@@ -229,6 +228,7 @@ const SubProductInterface = () => {
                                         </select><br />
                                         <Label for="image">Image</Label>
                                         <Input
+                                            multiple="multiple"
                                             type="file"
                                             name="image"
                                             id="image"

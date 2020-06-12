@@ -9,9 +9,9 @@ html,
 #root,
 body,
 #root > div {
-  height: 100%;
-  min-width: 580px;
-  overflow-x: hidden;
+  width: 100%!important;
+  height: 100%!important;
+  margin: 0!important; padding: 0!important
 }
 
 code {
@@ -26,6 +26,20 @@ code {
 }
 
 /* ------------------ Detail Produtc ------------------- */
+
+.was {
+  color: red;
+}
+.promotag {
+  display: inline-block;
+  font-size: 0.6em;
+  color: #fff;
+  padding: 7px;
+  position: relative;
+  top: -4px;
+  left: 20px;
+  background-color: red;
+}
 
 .btn-cart {
   width: 100%;
@@ -290,7 +304,6 @@ code {
 }
 
 .supbtn,.buttonreset {
-  position: absolute;
   right: 1em;
   top: 0;
   margin: 0;
@@ -300,9 +313,24 @@ code {
   border: none;
 }
 
+.buttonreset {
+  position: absolute;
+
+}
 .productcarttitle {
   display: flex;
   justify-content: space-between;
   margin-top: 10px;
   white-space: nowrap;
 }
+
+/*-------- Enleve le x des input search ------ */
+    /* on IE */
+input[type=search]::-ms-clear {  display: none; width : 0; height: 0; }
+input[type=search]::-ms-reveal {  display: none; width : 0; height: 0; }
+
+    /* on Chrome */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration { display: none; }

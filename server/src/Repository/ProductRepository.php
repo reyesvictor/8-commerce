@@ -115,11 +115,11 @@ class ProductRepository extends ServiceEntityRepository
             $query .= ') AND ';
         }
         if ($data['category']) {
-            $query .= ' category.name REGEXP ? AND ';
+            $query .= ' category.name = ? AND ';
             array_push($arrayExecute, $data['category']);
         }
         if ($data['subcategory']) {
-            $query .= ' sub_category.name REGEXP ?  ';
+            $query .= ' sub_category.name = ?  ';
             array_push($arrayExecute, $data['subcategory']);
         }
         if (substr($query, -6) == "WHERE ") {

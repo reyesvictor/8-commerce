@@ -6,18 +6,18 @@
   width: 500px;
   border-radius: 3px;
   box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.05);
-  
+
   /* A VOIR... */
   right: 288px;
 }
 
 .part-div {
   border-left: 0.5px solid rgb(224, 224, 224);
-  padding: 0!important;
+  /* padding: 0!important; */
 }
 
 .part-catsubcat {
-  padding: 0!important;
+  padding: 0 !important;
 }
 
 .sugg-header {
@@ -55,10 +55,9 @@
   background-color: rgb(250, 250, 250);
 }
 
-.sugg-product_img {
-  height: 100%;
-  width: 50px;
-  margin: 10px 10px;
+.sugg-product_price {
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .sugg-cat {
@@ -75,4 +74,3 @@
   color: black;
   text-decoration: none;
 }
-

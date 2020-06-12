@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Redirect } from "react-router-dom";
 import $ from "jquery";
 import axios from "axios";
 import "./SuggestionSearch.css";
@@ -21,6 +22,7 @@ export default class SuggestionSearch extends Component {
 
     this.handleInput = this.handleInput.bind(this);
     this.closeSugg = this.closeSugg.bind(this);
+    this.handleEnter = this.handleEnter.bind(this);
   }
 
   async handleInput(e) {
@@ -36,7 +38,15 @@ export default class SuggestionSearch extends Component {
 
   closeSugg() {
     this.setState({ show: false, input: "" });
-    $('#form').val('')
+    $("#form").val("");
+  }
+
+  handleEnter(e) {
+    e.preventDefault();
+    console.log(this.state.input)
+    // if (e.keyCode == 13) {
+    // }
+    window.location.href = '/search?name=' + this.state.input
   }
 
   getSuggestions() {
@@ -51,7 +61,7 @@ export default class SuggestionSearch extends Component {
         headers: header,
       })
       .then(async (res) => {
-        console.log(res.data);
+        console.log(res.data.products);
         await this.setState({
           suggProducts: res.data.products,
           suggCat: res.data.catsubcat[0].category,
@@ -86,44 +96,69 @@ export default class SuggestionSearch extends Component {
       "https://pluspng.com/img-png/png-school-bag-j-international-bags-manufacturer-of-school-bag-college-bag-from-chennai-494.png";
 
     return (
-      <div ref={(node) => {
-        this.node = node;
-      }}>
-        <Form inline>
+      <div
+        ref={(node) => {
+          this.node = node;
+        }}
+      >
+        <Form 
+        onSubmit={this.handleEnter}
+        inline
+        >  
           <FormControl
             type="text"
             placeholder="Quick Search"
             className="mr-sm-2"
             onChange={this.handleInput}
             id="form"
-            autocomplete="off"
+            autoComplete="off"
           />
         </Form>
 
         {isDataReady && products ? (
-          <div
-            className={show ? "sugg-div row" : "sugg-div d-none"}
-          >
+          <div className={show ? "sugg-div row" : "sugg-div d-none"}>
             <div className="col-6 d-inline part-catsubcat">
               <div>
-                {categories.length > 0 && (
+                {categories.length < 1 ? (
+                  <>
+                    <span className="sugg-header">Category</span>
+                    <div className="sugg-no-product">
+                      <i>No Categories</i>
+                    </div>
+                  </>
+                ) : (
                   <span className="sugg-header">Category</span>
                 )}
                 {categories.map((category) => {
                   return (
-                    <a href={"/search?category=" + category.name} className="sugg-a" key={category.id}>
+                    <a
+                      href={"/search?category=" + category.name}
+                      className="sugg-a"
+                      key={category.id}
+                    >
                       <div className="sugg-cat">{category.name}</div>
                     </a>
                   );
                 })}
               </div>
               <div>
-                {subcategories.length > 0 && (
+                {subcategories.length < 1 ? (
+                  <>
+                    <span className="sugg-header">Subcategory</span>
+                    <div className="sugg-no-product">
+                      <i>No Subcategories</i>
+                    </div>
+                  </>
+                ) : (
                   <span className="sugg-header">Subcategory</span>
                 )}
                 {subcategories.map((subcategory) => {
                   return (
-                    <a href={"/search?subcategory=" + subcategory.name} className="sugg-a" key={subcategory.id}>
+                    <a
+                      href={"/search?subcategory=" + subcategory.name}
+                      className="sugg-a"
+                      key={subcategory.id}
+                    >
                       <div className="sugg-cat">{subcategory.name}</div>
                     </a>
                   );
@@ -133,13 +168,27 @@ export default class SuggestionSearch extends Component {
             <div className="col-6 d-inline part-div">
               {products.length < 1 ? (
                 <>
-                  <span className="mb-2 sugg-header">Products<a href="#" onClick={this.closeSugg}><i className="material-icons md-18 float-right mr-2">close</i></a></span>
+                  <span className="mb-2 sugg-header">
+                    Products
+                    <a href="#" onClick={this.closeSugg}>
+                      <i className="material-icons md-18 float-right mr-2">
+                        close
+                      </i>
+                    </a>
+                  </span>
                   <div className="sugg-no-product">
                     <i>No products</i>
                   </div>
                 </>
               ) : (
-                <span className="mb-2 sugg-header">Products<a href="#" onClick={this.closeSugg}><i className="material-icons md-18 float-right mr-2">close</i></a></span>
+                <span className="mb-2 sugg-header">
+                  Products
+                  <a href="#" onClick={this.closeSugg}>
+                    <i className="material-icons md-18 float-right mr-2">
+                      close
+                    </i>
+                  </a>
+                </span>
               )}
               {products.map((product) => {
                 return (
@@ -148,14 +197,18 @@ export default class SuggestionSearch extends Component {
                     className="sugg-product"
                     key={product.id}
                   >
-                    <div>
+                    <div className="row p-1">
                       <img
                         src={process.env.REACT_APP_API_LINK + product.images[0]}
-                        className="sugg-product_img"
+                        className="sugg-product_img col-4"
                       ></img>
-                      {product.title.length < 22
-                        ? product.title
-                        : product.title.substr(0, 22) + "..."}
+                      <div className="col-8">
+                        {product.title.length < 22
+                          ? product.title
+                          : product.title.substr(0, 22) + "..."}
+                          <br/>
+                          <span className="sugg-product_price">{product.price+" €"}</span>
+                      </div>
                     </div>
                   </a>
                 );

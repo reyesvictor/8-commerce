@@ -20,7 +20,7 @@ class Subproduct
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"products", "subproduct", "supplier_order_details"})
+     * @Groups({"products", "subproduct", "supplier_order_details", "supplier_products"})
      */
     private $id;
 
@@ -33,19 +33,19 @@ class Subproduct
 
     /**
      * @ORM\Column(type="float")
-     * @Groups({"products", "subproduct", "supplier_order_details"})
+     * @Groups({"products", "subproduct", "supplier_order_details", "supplier_products"})
      */
     private $price;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"products", "subproduct", "supplier_order_details"})
+     * @Groups({"products", "subproduct", "supplier_order_details", "supplier_products"})
      */
     private $size;
 
     /**
      * @ORM\Column(type="float", length=255)
-     * @Groups({"products", "subproduct", "supplier_order_details"})
+     * @Groups({"products", "subproduct", "supplier_order_details", "supplier_products"})
      */
     private $weight;
 
@@ -63,19 +63,14 @@ class Subproduct
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"products", "subproduct", "supplier_order_details"})
+     * @Groups({"products", "subproduct", "supplier_order_details", "supplier_products"})
      */
     private $stock;
 
     /**
-     * @ORM\OneToMany(targetEntity=Commande::class, mappedBy="Subproduct")
-     */
-    private $commandes;
-
-    /**
      * @ORM\ManyToOne(targetEntity=Color::class, inversedBy="subproduct")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"subproduct","products", "supplier_order_details"})
+     * @Groups({"subproduct","products", "supplier_order_details", "supplier_products"})
      */
     private $color;
 
@@ -84,10 +79,15 @@ class Subproduct
      */
     private $supplierOrderSubproducts;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=UserOrder::class, mappedBy="subproduct")
+     */
+    private $userOrders;
+
     public function __construct()
     {
-        $this->commandes = new ArrayCollection();
         $this->supplierOrderSubproducts = new ArrayCollection();
+        $this->userOrders = new ArrayCollection();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -188,37 +188,6 @@ class Subproduct
         return $this;
     }
 
-    /**
-     * @return Collection|Commande[]
-     */
-    public function getCommandes(): Collection
-    {
-        return $this->commandes;
-    }
-
-    public function addCommande(Commande $commande): self
-    {
-        if (!$this->commandes->contains($commande)) {
-            $this->commandes[] = $commande;
-            $commande->setSubproduct($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCommande(Commande $commande): self
-    {
-        if ($this->commandes->contains($commande)) {
-            $this->commandes->removeElement($commande);
-            // set the owning side to null (unless already changed)
-            if ($commande->getSubproduct() === $this) {
-                $commande->setSubproduct(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getColor(): ?Color
     {
         return $this->color;
@@ -257,6 +226,34 @@ class Subproduct
             if ($supplierOrderSubproduct->getSubproduct() === $this) {
                 $supplierOrderSubproduct->setSubproduct(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserOrder[]
+     */
+    public function getUserOrders(): Collection
+    {
+        return $this->userOrders;
+    }
+
+    public function addUserOrder(UserOrder $userOrder): self
+    {
+        if (!$this->userOrders->contains($userOrder)) {
+            $this->userOrders[] = $userOrder;
+            $userOrder->addSubproduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserOrder(UserOrder $userOrder): self
+    {
+        if ($this->userOrders->contains($userOrder)) {
+            $this->userOrders->removeElement($userOrder);
+            $userOrder->removeSubproduct($this);
         }
 
         return $this;

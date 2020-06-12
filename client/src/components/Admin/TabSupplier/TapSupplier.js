@@ -12,6 +12,11 @@ function Suppliers() {
     const [allSupplier, setAllSupplier] = useState([]);
     const [postDataOrder, setPostDataOrder] = useState([]);
     const [showDetails, setShowDetails] = useState(false);
+    const [limit, setLimit] = useState(5);
+    const [offset, setOffset] = useState(0);
+    const [pageCount, setPageCount] = useState();
+    // const [showConfirm, setShowConfirm] = useState(false);
+    // const [returnConfirm, setReturnConfirm] = useState(false);
     const optionSelect = [];
     const [divOrder, setDivOrder] = useState([]);
 
@@ -27,24 +32,31 @@ function Suppliers() {
     }, []);
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/api/supplier/order", config).then(e => {
+        axios.get(`http://127.0.0.1:8000/api/supplier/order?offset=${offset}&limit=${limit}`, config).then(async e => {
+            await setPageCount(Math.ceil(e.data.nbResults / limit))
             console.log(e.data.data)
             const newPostDataOrder = e.data.data.map((order) =>
                 <tr key={order.id}>
                     <td><p className="myMargin align-items-center">{order.id}</p></td>
                     <td><p className="myMargin">{order.our_address}</p></td>
-                    <td><p className="myMargin">{order.price}</p></td>
+                    <td><p className="myMargin">{order.price} €</p></td>
                     <td><button onClick={e => e.preventDefault() + showDetailsOrder(order.id)} className="btn btn-outline-dark m-1">View</button></td>
                     {order.status == false ?
-                        <td><button className="btn btn-outline-success m-1">Mark as arrived</button></td> :
+                        <td><button onClick={e => e.preventDefault() + markShipped(order.id)} className="btn btn-outline-success m-1">Mark as arrived</button></td> :
                         <td><button className="btn btn-outline-success m-1 disabled" disabled>Arrived ✅</button></td>
                     }
                 </tr>
             )
             setPostDataOrder(newPostDataOrder);
         });
-    }, []);
+    }, [offset]);
 
+    const handlePageClick = (e) => {
+        const selectedPage = e.selected;
+        const newOffset = selectedPage * limit;
+        setOffset(newOffset)
+    };
+    
     allSupplier.map(supp => {
         optionSelect.push(<option key={supp.id} value={supp.id}>{supp.name}</option>)
     });
@@ -77,8 +89,38 @@ function Suppliers() {
 
     function showDetailsOrder(id) {
         axios.get("http://127.0.0.1:8000/api/supplier/order/" + id, config).then(res => {
-            setDivOrder(res.data.supplierOrderSubproducts)
+            setDivOrder(res.data.supplierOrderSubproducts);
+            console.log(res.data.supplierOrderSubproducts)
             setShowDetails(true);
+        }).catch(error => {
+            console.log(error);
+        });
+    }
+
+    function markShipped(id) {
+        // setShowConfirm(true)
+
+        const body = {
+            "status" : true
+        };
+        axios.put("http://127.0.0.1:8000/api/supplier/order/" + id, body, config).then(res => {
+            toast.success("Order received !", { position: "top-center" });
+            axios.get("http://127.0.0.1:8000/api/supplier/order", config).then(e => {
+                console.log(e.data.data);
+                const newPostDataOrder = e.data.data.map((order) =>
+                    <tr key={order.id}>
+                        <td><p className="myMargin align-items-center">{order.id}</p></td>
+                        <td><p className="myMargin">{order.our_address}</p></td>
+                        <td><p className="myMargin">{order.price}</p></td>
+                        <td><button onClick={e => e.preventDefault() + showDetailsOrder(order.id)} className="btn btn-outline-dark m-1">View</button></td>
+                        {order.status == false ?
+                            <td><button onClick={e => e.preventDefault() + markShipped(order.id)} className="btn btn-outline-success m-1">Mark as arrived</button></td> :
+                            <td><button className="btn btn-outline-success m-1 disabled" disabled>Arrived ✅</button></td>
+                        }
+                    </tr>
+                )
+                setPostDataOrder(newPostDataOrder);
+            });
         }).catch(error => {
             console.log(error);
         });
@@ -107,7 +149,7 @@ function Suppliers() {
                     </Modal.Body>
                 </Modal>
                 <Modal show={showDetails} onHide={() => setShowDetails(false)}>
-                    <Modal.Header closeButton>New Supplier !</Modal.Header>
+                    <Modal.Header closeButton>Order !</Modal.Header>
                     <Modal.Body>
                         {divOrder.length > 0 &&
                         divOrder.map( subProduct => 
@@ -115,29 +157,36 @@ function Suppliers() {
                                 <table className="productinCart">
                                     <tbody>
                                         <tr>
-                                            <td rowSpan="3" className="tableborder">
-                                                <img src="http://127.0.0.1:8000/api/image/2/default/1.jpg"/>
-                                            </td>
                                             <td>
                                                 <span><b>Title:</b> { subProduct.subproduct.product.title}</span>
                                             </td>
                                         </tr>
+                                        
                                         <tr className="tableborder">
                                             <td className="detailsproduct">
+                                              <img src={`http://127.0.0.1:8000/api/image/${subProduct.subproduct.product.id}/default/1.jpg`}/>
                                                 <span><b>ID:</b> {subProduct.subproduct.id}</span>
                                                 <span><b>Color:</b> {subProduct.subproduct.color.name}</span>
                                                 <span><b>Size:</b> {subProduct.subproduct.size}</span>
                                                 <span><b>Quantity:</b> {subProduct.quantity}</span>
-                                                <span><b>Price:</b> {subProduct.subproduct.price}</span>
+                                                <span><b>Price:</b> {subProduct.subproduct.price} €</span>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         )}
-                    <Button color="dark" className="mt-4" block onClick={() => setShowDetails(false)}>Close</Button>
+                        <Button color="dark" className="mt-4" block onClick={() => setShowDetails(false)}>Close</Button>
                     </Modal.Body>
                 </Modal>
+                {/* <Modal show={showConfirm} onHide={() => setShowConfirm(false)}>
+                    <Modal.Header closeButton>Confirm Order !</Modal.Header>
+                    <Modal.Body>
+                        <h2 className="mt-3 mb-5">Have you received your order ?</h2>
+                        <Button color="success" className="mt-4" block onClick={() => setShowConfirm(false)}>Yes, confirmed</Button>
+                        <Button color="dark" className="mt-4" block onClick={() => setShowConfirm(false)}>Close</Button>
+                    </Modal.Body>
+                </Modal> */}
             </div>
             <div className="row border p-2">
                 <table>
@@ -146,7 +195,7 @@ function Suppliers() {
                             <th><p className="myMargin align-items-center"> ID </p></th>
                             <th><p className="myMargin"> Order </p></th>
                             <th><p className="myMargin"> Price </p></th>
-                            <th><p className="myMargin" colspan="3" className="m-1"> Actions </p></th>
+                            <th><p className="myMargin" colSpan="3" className="m-1"> Actions </p></th>
                         </tr>
                     </thead>
                     <tbody>{postDataOrder}</tbody>
@@ -154,18 +203,18 @@ function Suppliers() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <div>
-                    {/* <ReactPaginate
+                    <ReactPaginate
                         previousLabel={"prev"}
                         nextLabel={"next"}
                         breakLabel={"..."}
                         breakClassName={"break-me"}
-                        pageCount={pageCountCategories}
+                        pageCount={pageCount}
                         marginPagesDisplayed={1}
                         pageRangeDisplayed={2}
-                        onPageChange={handlePageClickCategories}
+                        onPageChange={handlePageClick}
                         containerClassName={"pagination"}
                         subContainerClassName={"pages pagination"}
-                        activeClassName={"active"} /> */}
+                        activeClassName={"active"} />
                 </div>
             </div>
         </>

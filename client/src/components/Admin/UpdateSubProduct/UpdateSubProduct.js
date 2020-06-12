@@ -6,6 +6,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouteMatch } from "react-router-dom";
 import './UpdateSubProduct.css'
+import CreateColorModal from '../Color/CreateColorModal';
+import Modal from 'react-bootstrap/Modal';
 import store from '../../../store';
 
 function UpdateSubProduct() {
@@ -21,6 +23,11 @@ function UpdateSubProduct() {
 
     let id = useRouteMatch("/admin/subproduct/:id/:subproduct/update").params.id;
     let idSubproduct = useRouteMatch("/admin/subproduct/:id/:subproduct/update").params.subproduct;
+
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
     const token = store.getState().auth.token
     const config = {
@@ -71,7 +78,7 @@ function UpdateSubProduct() {
         .catch(error => {
             toast.error('Error !', {position: 'top-center'});
         });
-    }, [])
+    }, [show])
    
     useEffect(() => {
         if (isReady) {
@@ -114,7 +121,7 @@ function UpdateSubProduct() {
                             <option value="">--- SELECT COLOR ---</option>
                             {colors}
                     </select>
-                    {/* <input className="inputeStyle form-control" type="text" name="color" placeholder="Color article" value={color} onChange={(e) => setColor(e.target.value)}/> */}
+                    <a className='text-info small' style={{ cursor:'pointer' }} variant="primary" onClick={handleShow}> Create a new Color ? </a>
                 </div>
                 <div className="form-group">
                     <label htmlFor="size">Size</label>
@@ -134,6 +141,10 @@ function UpdateSubProduct() {
                 </div>
                 <button type="submit" className="btn btn-dark" onClick={(e) => lauch(e)}>Submit</button>
             </form>
+
+            <Modal show={show} onHide={handleClose}>
+                <CreateColorModal />
+            </Modal>
         </div>
     )
 }

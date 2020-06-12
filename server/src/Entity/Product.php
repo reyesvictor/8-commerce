@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Product
 {
     /**
-     * @Groups({"products","category","subproduct", "supplier_order_details"})
+     * @Groups({"products","category","subproduct", "supplier_order_details", "supplier_products"})
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -25,7 +25,7 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"products","category", "subproduct", "supplier_order_details"})
+     * @Groups({"products","category", "subproduct", "supplier_order_details", "supplier_products"})
      */
     private $title;
 
@@ -49,34 +49,41 @@ class Product
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"products","category"})
+     * @Groups({"products","category", "supplier_products"})
      */
     private $clicks;
 
     /**
      * @ORM\OneToMany(targetEntity=Subproduct::class, mappedBy="product", orphanRemoval=true, cascade={"remove"}, cascade={"persist"})
-     * @Groups("products")
+     * @Groups({"products", "supplier_products"})
      */
     private $subproducts;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"products","category"})
+     * @Groups({"products","category", "supplier_products"})
      */
     private $sex;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products","category"})
+     * @Groups({"products","category", "supplier_products"})
      */
     private $status;
 
     /**
      * @ORM\ManyToOne(targetEntity=SubCategory::class, inversedBy="Product")
      * @ORM\JoinColumn(nullable=false,onDelete="CASCADE")
-     * @Groups("products")
+     * @Groups({"products", "supplier_products"})
      */
     private $subCategory;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Supplier::class, inversedBy="product")
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"products"})
+     */
+    private $supplier;
 
 
 
@@ -91,8 +98,7 @@ class Product
         $metadata->addPropertyConstraint('description', new Assert\NotBlank());
         $metadata->addPropertyConstraint('description', new Assert\Type(['type' => ['string']]));
         $metadata->addPropertyConstraint('status', new Assert\Type(['type' => ['bool']]));
-        $metadata->addPropertyConstraint('sex', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('sex', new Assert\Type(['type' => ['alpha']]));
+        $metadata->addPropertyConstraint('supplier', new Assert\NotBlank());
         $metadata->addPropertyConstraint('promo', new Assert\Type(['type' => ['integer']]));
     }
 
@@ -225,6 +231,18 @@ class Product
     public function setSubCategory(?SubCategory $subCategory): self
     {
         $this->subCategory = $subCategory;
+
+        return $this;
+    }
+
+    public function getSupplier(): ?Supplier
+    {
+        return $this->supplier;
+    }
+
+    public function setSupplier(?Supplier $supplier): self
+    {
+        $this->supplier = $supplier;
 
         return $this;
     }

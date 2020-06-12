@@ -3,6 +3,8 @@ import axios from "axios";
 import { Parallax } from "react-parallax";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Checkout from './Checkout'
+
 
 class Panier extends Component {
   constructor() {
@@ -41,7 +43,6 @@ class Panier extends Component {
                   productsCart: [...this.state.productsCart, total],
                 });
               });
-            console.log(data.data.stock)
             if (e.quantite > data.data.stock) {
               let message = "Maximum quantity for " + data.data.product.title + " is : " + data.data.stock;
               toast.error(message, { position: "top-center" });
@@ -59,9 +60,14 @@ class Panier extends Component {
       let products = []
       let panier = [];
       this.state.productsCart.forEach(function (item) {
-        console.log(item.stock)
         if (item.id == e.id) {
-          item.quantity = parseInt(e.value)
+          if (e.value > item.stock) {
+            let message = "Maximum quantity for " + item.product.title + " is : " + item.stock;
+            toast.error(message, { position: "top-center" });
+          }
+          else {
+            item.quantity = parseInt(e.value)
+          }
         }
         somme = item.quantity * item.price
         newprice = newprice + somme
@@ -70,30 +76,35 @@ class Panier extends Component {
         sessionStorage.setItem("panier", JSON.stringify(panier));
         products.push(item)
       });
-
       this.setState({ productsCart: products, nombreTotal: newtotal, prixTotal: newprice })
     }
   }
 
   onsuppress(e) {
     let id = e.id.replace("button_", "")
-    let oldprice = this.state.prixTotal
-    let oldtotal = this.state.nombreTotal
     let newprice = 0
     let newtotal = 0
+    let somme = 0;
+    let products = []
+    let panier = [];
     this.state.productsCart.forEach(function (item) {
-      if (item.id == id) {
-        let quantityperprice = item.quantity * item.price;
-        newprice = oldprice - quantityperprice
-        newtotal = oldtotal - item.quantity
+      if (item.id != id) {
+        somme = item.quantity * item.price
+        newprice = newprice + somme
+        newtotal = newtotal + item.quantity
+        panier.push({ 'productid': item.id, "quantite": item.quantity })
+        products.push(item)
+        console.log("itemquantity", item.quantity)
+        console.log("newtotal", newtotal)
       }
     });
-    let panier = JSON.parse(sessionStorage.getItem("panier", []));
-    let filteredArray = panier.filter(item => item.productid != e.value)
-    sessionStorage.setItem("panier", JSON.stringify(filteredArray));
-    const items = this.state.productsCart.filter(item => item.id != id)
-    this.setState({ productsCart: items, prixTotal: newprice, nombreTotal: newtotal })
-
+    if (panier.length == 0) {
+      sessionStorage.removeItem("panier");
+    } else {
+      sessionStorage.setItem("panier", JSON.stringify(panier));
+    }
+    this.setState({ productsCart: products, prixTotal: newprice, nombreTotal: newtotal })
+    window.location.reload(true)
   }
 
   render() {
@@ -106,17 +117,17 @@ class Panier extends Component {
       );
     const productsInCart = this.state.nombreTotal;
     return (
-      <div key={this.state.key} className="container-fluid overflow-hidden h-100 m-0 pl-2 pr-2">
-        <div className="row h-100">
-          <div className="col-md-6 m-0 p-3">checkout</div>
-          <div className="col-md-6 productImgBg m-0 p-3">
+      <div key={this.state.key} className="h-100 container-fluid  m-0 p-0">
+        <div className="row h-100 m-0 p-0">
+          <div className="col-md-6 m-0 p-3"><Checkout /></div>
+          <div className="col-md-6 order-first order-lg-last order-md-first order-sm-
+    first productImgBg m-0 p-3">
             <ToastContainer />
             <div id="LargeCart" className="LargeCart">
               <h2>Voir le panier</h2>
               <hr />
               {Message}
               <table >
-
                 {this.state.productsCart != [] &&
                   this.state.productsCart.map((e) => {
                     return (
@@ -145,7 +156,7 @@ class Panier extends Component {
                                 id={e.id}
                                 name="tentacles"
                                 defaultValue={e.quantity}
-                                onInput={e => this.handleChange(e.target)}
+                                onChange={e => this.handleChange(e.target)}
                                 min="1"
                                 max="20"
                               ></input>
@@ -157,12 +168,9 @@ class Panier extends Component {
                   })}
               </table>
               <div className="total">
-                <span>{this.state.nombreTotal} produits</span>
+                <span>{this.state.nombreTotal} {this.state.nombreTotal > 1 ? 'produits' : 'produit'}</span>
                 <span>Total : {this.state.prixTotal} €</span>
               </div>
-              <a href="/panier">
-                <button className="btn-cart">Checkout</button>
-              </a>
             </div>
           </div>
         </div>

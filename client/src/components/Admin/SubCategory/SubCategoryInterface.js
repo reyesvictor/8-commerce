@@ -179,12 +179,11 @@ const SubCategoryInterface = () => {
                                     placeholder={oldSubCatName}
                                     onChange={onChangeNew}
                                 />
-                                <Button color="dark" className="mt-4" block>Update</Button>
+                                <Button color="dark" className="mt-4" block>Create</Button>
                             </FormGroup>
                         </Form>
                     </Modal.Body>
                 </Modal>
-                <button onClick={() => window.location.href = '/admin/update/category/' + id} className='btn btn-outline-info m-2'> Modify {nameCategory} </button>
             </div>
             <div className="row border p-2">
                 <table>

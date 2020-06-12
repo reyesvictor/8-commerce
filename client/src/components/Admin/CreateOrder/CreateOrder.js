@@ -7,9 +7,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
 
 function CreateOrder() {
-    const [show, setShow] = useState(false);
-    const [supplierName, setSupplierName] = useState([]);
-    const [show2, setShow2] = useState(false);
     const [idSupplier, setIdSupplier] = useState([]);
     const [ourAdress, setOurAdress] = useState([]);
     const [subProduct, setSubProduct] = useState([]);
@@ -17,6 +14,7 @@ function CreateOrder() {
     const [allSupplier, setAllSupplier] = useState([]);
     const [allSubProduct, setAllSubproduct] = useState([]);
     const [isReady, setIsReady] = useState(false);
+    const [goSelectProduct, setGoSelectProduct] = useState(false);
     const [cart, setCart] = useState([]);
     const optionSelect = [];
     const optionSubProduct = [];
@@ -33,20 +31,36 @@ function CreateOrder() {
     }, []);
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/api/subproduct", config).then(e => {
-            setAllSubproduct(e.data.data);
-        });
-    }, []);
+        if (goSelectProduct) {
+            axios.get("http://127.0.0.1:8000/api/supplier/" + idSupplier + "/products", config).then(e => {
+                if(Array.isArray(e.data.product)){
+                    setAllSubproduct(e.data.product);
+                } else {
+                    setAllSubproduct([]);
+                }
+            });
+            setGoSelectProduct(false);
+        }
+    }, [goSelectProduct]);
 
     allSupplier.map(supp => {
         optionSelect.push(<option key={supp.id} value={supp.id}>{supp.name}</option>)
     });
 
-    allSubProduct.map(sub => {
-        optionSubProduct.push(<option key={sub.id} value={sub.id + "/" + sub.product.id + "/" + sub.product.title + "/" + sub.color.name + "/" + sub.size + "/" + sub.price + "/" + sub.color.id}>
-                {sub.product.id}: {sub.product.title.substr(0, 41)} - {sub.color.name} - {sub.size} ({sub.stock ? sub.stock : 0})
-            </option>)
+    allSubProduct.map(arr => {
+        arr.subproducts.map( sub => {
+            // console.log(sub)
+            optionSubProduct.push(<option key={sub.id} value={sub.id + "/" + arr.id + "/" + arr.title + "/" + sub.color.name + "/" + sub.size + "/" + sub.price + "/" + sub.color.id}>
+                    {arr.id}: {arr.title.substr(0, 41)} - {sub.color.name} - {sub.size} ({sub.stock ? sub.stock : 0})
+                </option>)
+        });
     });
+
+    function handleSelect(event) {
+        setIdSupplier(event.target.value);
+        setGoSelectProduct(true);
+        setCart([]);
+    }
 
     const [isInvalid, setIsInvalid] = useState(false);
     const onChangeAdress = (event) => {
@@ -64,7 +78,7 @@ function CreateOrder() {
             invalids.idsupplier = "PLease select a supplier";
         }
         if (ourAdress != "") {
-            if (ourAdress.match(/[\\'"/!$%^&*()_+|~=`{}[:;<>?,.@#\]]/)) {
+            if (ourAdress.match(/[\\"/!$%^&*()_+|~=`{}[:;<>?.@#\]]/)) {
                 invalids.adress = "Invalids charactere";
             }
         } else {
@@ -115,7 +129,7 @@ function CreateOrder() {
             <Form onSubmit={onSubmit2}>
                 <FormGroup>
                 <Label for="supplier">Supplier</Label>
-                    <select className={"form-control mtop30 " + (isInvalid.idsupplier ? 'is-invalid' : 'inputeStyle')} onChange={e => setIdSupplier(e.target.value)}>
+                    <select className={"form-control mtop30 " + (isInvalid.idsupplier ? 'is-invalid' : 'inputeStyle')} onChange={handleSelect}>
                         <option value="">- - - Select Supplier - - -</option>
                         {optionSelect}
                     </select>
@@ -130,7 +144,10 @@ function CreateOrder() {
                         <div className="invalid-feedback">{ isInvalid.adress }</div>
                     <Label for="products">Products</Label>
                     <select className={"form-control mtop30 " + (isInvalid.subproduct ? 'is-invalid' : 'inputeStyle')} onChange={ e => setSubProduct(e.target.value)}>
-                        <option value="">- - - Select SubProduct - - -</option>
+                        {Number(idSupplier) ? ( optionSubProduct.length > 0 ?
+                            <option value="">- - - Select SubProduct - - -</option> 
+                            :<option value="">- - - No Product - - -</option> )
+                            :<option value="">- - - Select Supplier - - -</option>}
                         {optionSubProduct}
                     </select>
                     <div className="invalid-feedback">{ isInvalid.subproduct }</div>

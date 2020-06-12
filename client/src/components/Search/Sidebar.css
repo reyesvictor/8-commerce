@@ -1,3 +1,4 @@
+
 #filter-link:hover {
   text-decoration: underline;
   cursor: pointer;
@@ -5,4 +6,106 @@
 
 .container {
   border-bottom: 0!important;
+}
+
+.searchbar-name {
+  width: 100%;
+}
+
+#inputSearchName {
+  border: 0;
+  margin-bottom: 30px;
+  padding-bottom: 10px;
+}
+
+#inputSearchName:focus {
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  border-bottom: 1px solid rgba(195, 195, 195);
+  transition: width 0.6s cubic-bezier(0.52, -0.43, 0.47, 1.29);
+}
+
+
+/* FILTER BOX */
+#filter-div {
+  position: absolute;
+  z-index: 998;
+  background-color: #FFF;
+  padding: 10px;
+  width: 20vw;
+  height: auto;
+  float: left;
+  margin: 20vh 0;
+  border: 1px solid rgb(224, 224, 224);
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.05);
+  border-radius: 0 3px 3px 0;
+  overflow: hidden;
+  overflow-y: hidden;
+}
+
+#btn-close-filter:hover {
+  cursor: pointer;
+}
+
+.f-gender div {
+  display: inline;
+  /* justify-content: middle; */
+}
+
+.f-border {
+  margin-left: 20px;
+}
+
+.f-slider-val {
+  width:90%;
+}
+
+
+
+/* SLIDER */
+.slider.slider-horizontal .slider-track {
+  height: 5px;
+}
+
+.slider {
+  /* margin: 0 20px; */
+  margin-left: 30px;
+  width: 80%!important;
+  /* height: 4px!important; */
+}
+
+.slider-handle {
+  background-color: black;
+  background-image: none;
+  border-radius: 100%;
+  width: 15px;
+  height: 15px;
+}
+
+.slider-selection {
+  background-color: rgb(211, 211, 211);
+  background-image: none;
+}
+
+/* ANIMATION FILTER BOX */
+.to-right {
+  animation-name: slideLeftToRight;
+  animation-duration: 0.7s; 
+}
+
+@keyframes slideLeftToRight {
+  from {transform: translateX(-20vw)} 
+  to {transform: translateX(0vw)}
+}
+
+.to-left {
+  /* animation-name: slideRightToLeft;
+  animation-duration: 1s;  */
+  animation: slideRightToLeft 0.7s forwards;
+}
+
+@keyframes slideRightToLeft {
+  from {transform: translateX(0vw)} 
+  to {transform: translateX(-20vw)}
 }

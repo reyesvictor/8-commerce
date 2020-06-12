@@ -28,7 +28,6 @@ function ProductDescription() {
   useEffect(() => {
     axios.get('http://127.0.0.1:8000/api/product/' + id).then(resp => {
       setProduct(resp.data);
-
       //Getting the lowest price
       let prices = {}
       let product_temp = resp.data
@@ -42,7 +41,6 @@ function ProductDescription() {
         //Product has subproducts
         product_temp.subproducts.map(p => prices[product_temp.id].push(p.price))
       }
-
       //Boucler sur l'objet pour voir si il y a un prix minimal ou si il n'est pas disponible
       if (Object.keys(prices).length > 0) {
         const entries = Object.entries(prices)
@@ -50,7 +48,7 @@ function ProductDescription() {
           if (prices_list[0] == unavailable_msg) {
             product_temp['lowest_price'] = unavailable_msg
           } else {
-            product_temp['lowest_price'] = 'Starts at ' + Math.min.apply(Math, prices_list) + ' €'
+            product_temp['lowest_price'] = Math.min.apply(Math, prices_list)
           }
         }
       }
@@ -73,12 +71,11 @@ function ProductDescription() {
   let Unavailable = []
 
   if (product) {
-    console.log(product)
+    // console.log(product)
     if (product.length == 0) {
       loadingScreen.push(<div className="loading-screen"></div>);
     }
     else {
-
       subCategory = product.subCategory.name;
       Categoryname = product.subCategory.Category.name;
       testProps = product.description;
@@ -113,6 +110,8 @@ function ProductDescription() {
   const details = {
     title: product.title,
     price: lowestPrice,
+    promo: product.promo,
+    price_promo: Number(lowestPrice) - Number(lowestPrice) * (Number(product.promo) / 100),
     description_1: testProps.substr(0, 192),
     description_2: testProps.substr(192)
   };
@@ -206,24 +205,24 @@ function ProductDescription() {
   }
 
   const subproductsAvailable = () => {
-
     let pathCat = "/search?category=" + Categoryname;
     let pathSub = "/search?subcategory=" + subCategory;
-
     return (
       <div className="divDetails">
         <span><a href={pathCat}>{Categoryname}</a> / <a href={pathSub}>{subCategory}</a></span>
         {Unavailable}
         <h1>{details.title}</h1>
-        <h3 className='prix'>{verifyIfAProductIsChosen() ? chosenSubProduct.price + '€' : details.price}</h3>
+        <h3 className='prix'>{verifyIfAProductIsChosen() ? chosenSubProduct.promo > 0 ? <><span className="was"><s>{chosenSubProduct.price} €</s></span>
+          <span className="now">  {Math.round(chosenSubProduct.price * (chosenSubProduct.promo / 100))} €  </span></>
+          : chosenSubProduct.price + '€' : details.promo > 0 ?
+            <>Starts at <span className="was"><s>{details.price} €</s></span><span className="now">  {Math.round(details.price_promo)} €</span></> : 'Starts at' + details.price + '€'} </h3>
         <p className='description'>
           {details.description_1}
           <span className='complete'>{details.description_2}</span>
         </p>
         {testProps.length > 192 ? <p className="more" onClick={Complete}>{completeDes}</p> : null}
-        <p>{verifyIfAProductIsChosen() ? chosenSubProduct.stock + " pièces disponibles" : countstockAll + " pièces totales disponibles"}</p>
-        {chosenProductSize != '' && chosenProductColor != '' ? console.log('PRODUCT IS CHOSEN') + setChosenProduct() : console.log('NO CHOICE')}
-
+        <p>{verifyIfAProductIsChosen() ? chosenSubProduct.stock + " items available" : countstockAll + " items available in total"}</p>
+        {chosenProductSize != '' && chosenProductColor != '' ? console.log('PRODUCT IS CHOSEN') + setChosenProduct() : null}
         <p>Color</p>
         <select id='selectColor' defaultValue="No-Choice-Color" onChange={e => e.preventDefault() + console.log(e.target.value) + setChosenProductColor(e.target.value)}>
           <option value='No-Choice-Color' key="001" className='selectChoice' disabled>--- COLOR ({ColorOption.length})---</option>
@@ -239,15 +238,14 @@ function ProductDescription() {
           </>
           : null
         }
+        <p className="text-secondary">{verifyIfAProductIsChosen() ? <span><b>{chosenSubProduct.stock}</b> items available</span> : <span><b>{countstockAll}</b>  total items available</span>}</p>
         {product.status == true ? <button onClick={addCart} className='btn-cart'>Add to cart</button> : <button className='btn-cart'>Out of stock</button>}
       </div>
     )
   }
 
   const addCart = () => {
-    // [{"productid":2,"quantite":1},{"productid":3,"quantite":5}]
     let panier = sessionStorage.getItem('panier', []);
-
     if (chosenSubProduct && chosenSubProduct.id) {
       if (panier == null) {
         sessionStorage.setItem('panier', JSON.stringify([{ "productid": chosenSubProduct.id, "quantite": 1 }]));
@@ -277,7 +275,6 @@ function ProductDescription() {
     }
   }
 
-  // Product doesnt have subproducts
   const subproductsUnavailable = () => {
     return (
       <div className="divDetails">
@@ -290,7 +287,7 @@ function ProductDescription() {
         </p>
         <p className="more" onClick={Complete}>{completeDes}</p>
         <p>{verifyIfAProductIsChosen() ? chosenSubProduct.stock + " pièces disponibles" : countstockAll + " pièces totales disponibles"}</p>
-        {chosenProductSize != '' && chosenProductColor != '' ? console.log('PRODUCT IS CHOSEN') + setChosenProduct() : console.log('NO CHOICE')}
+        {chosenProductSize != '' && chosenProductColor != '' ? console.log('PRODUCT IS CHOSEN') + setChosenProduct() : null}
         <select id='selectSize' onChange={e => e.preventDefault() + console.log(e.target.value) + setChosenProductSize(e.target.value)}>
           <option value='' className='selectChoice' disabled>--- SIZE ({SizeOption.length})---</option>
           {SizeOption}
@@ -309,7 +306,7 @@ function ProductDescription() {
       let size_value = arr[i].size
       if (!arr_size_no_rep.includes(size_value)) {
         arr_size_no_rep.push(size_value)
-        options.push(<option key={'sub-option-size-' + i + size_value} value={size_value} className='selectChoice'>{size_value}</option>)
+        options.push(<option key={'sub-option-size-' + i + size_value} value={size_value}>{size_value}</option>)
       }
     }
     return options
@@ -319,7 +316,7 @@ function ProductDescription() {
     <div>
       <ToastContainer />
       <div className="container-fluid m-0 p-0">
-        <div className="row">
+        <div className="row m-0 p-0">
           <div className="col-md-7 productImgBg m-0 p-0">
             {product.status == true ? <> <div className='ulImgProduct'>
               {miniImageProduct}
@@ -338,7 +335,7 @@ function ProductDescription() {
             {product.subproducts && product.subproducts.length > 0 ? subproductsAvailable() : subproductsUnavailable()}
           </div>
         </div>
-        <div className="row">
+        <div className="row m-0 p-0">
           <div className="col-sm-12 sndrow"><br /> <br /> <br /> <br /> <br /> <br /> <br />   <br /> <br /> <br /> <br /> <br /> <br /> <br />   <br /> <br /> <br /> <br /> <br /> <br /> <br /></div>
         </div>
       </div>

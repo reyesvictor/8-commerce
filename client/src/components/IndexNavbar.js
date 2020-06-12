@@ -118,18 +118,18 @@ class IndexNavbar extends Component {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <NavItem>
-              <Nav.Link href="#">Homme</Nav.Link>
+              <Nav.Link href="/search?sexe=H">Men</Nav.Link>
             </NavItem>
             <NavItem>
-              <Nav.Link href="#">Femme</Nav.Link>
+              <Nav.Link href="/search?sexe=F">Women</Nav.Link>
             </NavItem>
             <NavItem>
-              <Nav.Link href="#">Accessoires</Nav.Link>
+              <Nav.Link href="/search?category=Accessories">Accessories</Nav.Link>
             </NavItem>
           </Navbar.Collapse>
         </Navbar>
         <Navbar id="underline">
-        <SuggestionSearch />
+          <SuggestionSearch />
           <Nav.Link href="/search" id="searchLogo">
             <img src={searchLogo} />
           </Nav.Link>
@@ -154,7 +154,7 @@ class IndexNavbar extends Component {
           </div>
           {this.state.isOpen ? (
             <div id="minicart" className="cartContainer">
-              <button className="buttonreset" onClick={() => this.operation()}><i class="material-icons md-36 marg">clear</i></button>
+              <button className="buttonreset" onClick={() => this.operation()}><i className="material-icons md-36 marg">clear</i></button>
               {Message}
               <table className="productinCart">
                 <tbody>
@@ -185,7 +185,7 @@ class IndexNavbar extends Component {
                 </tbody>
               </table>
               <div className="total">
-                <span>{this.state.nombreTotal} produits</span>
+                <span>{this.state.nombreTotal}  {this.state.nombreTotal > 1 ? 'produits' : 'produit'}</span>
                 <span>Total : {this.state.prixTotal} €</span>
               </div>
               <a href="/panier">

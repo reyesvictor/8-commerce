@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -52,19 +54,29 @@ class User implements UserInterface
     private $created_at;
 
     /**
-     * @ORM\OneToMany(targetEntity=Address::class, mappedBy="user_id")
-     */
-    private $addresses;
-
-    /**
      * @ORM\OneToMany(targetEntity=CardCredentials::class, mappedBy="user")
      */
     private $cardCredentials;
 
+    /**
+     * @ORM\OneToMany(targetEntity=AddressShipping::class, mappedBy="user")
+     * @Groups({"user_address"})
+     * @SerializedName("shippingAddress")
+     */
+    private $addressShippings;
+
+    /**
+     * @ORM\OneToMany(targetEntity=AddressBilling::class, mappedBy="user")
+     * @Groups({"user_address"})
+     * @SerializedName("billingAddress")
+     */
+    private $addressBillings;
+
     public function __construct()
     {
-        $this->adresses = new ArrayCollection();
         $this->cardCredentials = new ArrayCollection();
+        $this->addressShippings = new ArrayCollection();
+        $this->addressBillings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -184,37 +196,6 @@ class User implements UserInterface
     }
 
     /**
-     * @return Collection|Address[]
-     */
-    public function getAddresses(): Collection
-    {
-        return $this->addresses;
-    }
-
-    public function addAdress(Address $address): self
-    {
-        if (!$this->addresses->contains($address)) {
-            $this->addresses[] = $address;
-            $address->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAdress(Address $address): self
-    {
-        if ($this->addresses->contains($address)) {
-            $this->addresses->removeElement($address);
-            // set the owning side to null (unless already changed)
-            if ($address->getUser() === $this) {
-                $address->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection|CardCredentials[]
      */
     public function getCardCredentials(): Collection
@@ -239,6 +220,68 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($cardCredential->getUser() === $this) {
                 $cardCredential->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|AddressShipping[]
+     */
+    public function getAddressShippings(): Collection
+    {
+        return $this->addressShippings;
+    }
+
+    public function addAddressShipping(AddressShipping $addressShipping): self
+    {
+        if (!$this->addressShippings->contains($addressShipping)) {
+            $this->addressShippings[] = $addressShipping;
+            $addressShipping->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAddressShipping(AddressShipping $addressShipping): self
+    {
+        if ($this->addressShippings->contains($addressShipping)) {
+            $this->addressShippings->removeElement($addressShipping);
+            // set the owning side to null (unless already changed)
+            if ($addressShipping->getUser() === $this) {
+                $addressShipping->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|AddressBilling[]
+     */
+    public function getAddressBillings(): Collection
+    {
+        return $this->addressBillings;
+    }
+
+    public function addAddressBilling(AddressBilling $addressBilling): self
+    {
+        if (!$this->addressBillings->contains($addressBilling)) {
+            $this->addressBillings[] = $addressBilling;
+            $addressBilling->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAddressBilling(AddressBilling $addressBilling): self
+    {
+        if ($this->addressBillings->contains($addressBilling)) {
+            $this->addressBillings->removeElement($addressBilling);
+            // set the owning side to null (unless already changed)
+            if ($addressBilling->getUser() === $this) {
+                $addressBilling->setUser(null);
             }
         }
 

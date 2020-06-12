@@ -66,12 +66,13 @@ class SubProductController extends AbstractController
             $color = $this->getDoctrine()->getRepository(Color::class)->find($data->color_id);
             if (!$color) return $this->json(['message' => 'color not found.'], 404);
 
-            if (!isset($data->size)) return $this->json(['message' => 'Size is missing.'], 400);
-            if ($subproductRepository->findOneBy(['color' => $color, 'size' => $data->size])) return $this->json(['message' => 'SubProduct already exists'], 400);
-
+            
             if (!isset($data->product_id)) return $this->json(['message' => 'product id missing.'], 400);
             $product = $productRepository->findOneBy(['id' => $data->product_id]);
             if (!$product) return $this->json(['message' => 'product not found.'], 404);
+            
+            if (!isset($data->size)) return $this->json(['message' => 'Size is missing.'], 400);
+            if ($subproductRepository->findOneBy(['color' => $color, 'size' => $data->size, 'product' => $product])) return $this->json(['message' => 'SubProduct already exists'], 400);
 
             $subproduct->setSize(strtoupper($data->size));
             $subproduct->setColor($color);

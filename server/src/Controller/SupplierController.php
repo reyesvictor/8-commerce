@@ -25,7 +25,7 @@ class SupplierController extends AbstractController
         $count = $supplierRepository->countAllResults();
         $supplierOrders = $supplierRepository->findBy([], null, $request->query->get('limit'), $request->query->get('offset'));
         $supplierOrders = $normalizer->normalize($supplierOrders, null, ['groups' => 'supplier']);
- 
+
         return $this->json(['nbResults' => $count, 'data' => $supplierOrders], 200, [], ['groups' => 'supplier']);
     }
 
@@ -37,6 +37,19 @@ class SupplierController extends AbstractController
         $supplier = $supplierRepository->findOneBy(['id' => $request->attributes->get('id')]);
         if ($supplier) {
             return $this->json($supplier, 200, [], ['groups' => 'supplier_details']);
+        } else {
+            return $this->json(['message' => 'not found'], 404, []);
+        }
+    }
+
+    /**
+     * @Route("/api/supplier/{id}/products", name="supplier_products",methods="GET", requirements={"id":"\d+"})
+     */
+    public function supplierProducts(Request $request, SupplierRepository $supplierRepository)
+    {
+        $supplier = $supplierRepository->findOneBy(['id' => $request->attributes->get('id')]);
+        if ($supplier) {
+            return $this->json($supplier, 200, [], ['groups' => 'supplier_products']);
         } else {
             return $this->json(['message' => 'not found'], 404, []);
         }
@@ -60,7 +73,7 @@ class SupplierController extends AbstractController
         $em->persist($supplier);
         $em->flush();
 
-        return $this->json(['product' => $supplier], 201, [], ['groups' => 'supplier']);
+        return $this->json(['messgae' => 'created', 'supplier' => $supplier], 201, [], ['groups' => 'supplier']);
     }
 
     /**
@@ -82,7 +95,7 @@ class SupplierController extends AbstractController
                     return $this->json(['message' => $e->getMessage()], 400, []);
                 }
 
-                if(!isset($data->name)) return $this->json(['message' => 'name is missing'], 400, []); 
+                if (!isset($data->name)) return $this->json(['message' => 'name is missing'], 400, []);
 
                 $error = $validator->validate($supplier);
                 if (count($error) > 0) return $this->json($error, 400);
@@ -92,7 +105,7 @@ class SupplierController extends AbstractController
 
                 return $this->json(['supplier' => $supplier], 200, [], ['groups' => 'supplier', AbstractNormalizer::IGNORED_ATTRIBUTES => ['supplierOrders']]);
             } else {
-                return $this->json(['message' => 'product not found'], 404, []);
+                return $this->json(['message' => 'supplier not found'], 404, []);
             }
         } catch (NotEncodableValueException $e) {
             return $this->json(['message' => $e->getMessage()], 400);

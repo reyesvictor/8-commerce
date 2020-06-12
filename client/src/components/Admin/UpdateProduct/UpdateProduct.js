@@ -24,7 +24,9 @@ const UpdateProduct = () => {
     const [status, setStatus] = useState(false);
     const [allCategory, setAllCategory] = useState([]);
     const [subCategories, setSubCategories] = useState(1);
-    const token = store.getState().auth.token
+    const token = store.getState().auth.token;
+    const [supplier, setSupplier] = useState([]);
+    const [supplierOptions, setSupplierOptions] = useState([]);
     const config = {
         headers: {
             "Content-type": "application/json"
@@ -39,7 +41,8 @@ const UpdateProduct = () => {
 
     function formSubmit(e) {
         e.preventDefault();
-
+        console.log(subCategory);
+        if(subCategory === null) return toast.error('You need to choose a subcategory', {position: 'top-center'});
         setIsReady(true);
     }
     useEffect(() => {
@@ -58,6 +61,15 @@ const UpdateProduct = () => {
                     });
                     setSubCategories(optionCategory)
                 });
+                await axios.get("http://localhost:8000/api/supplier/").then((e) => {
+                    const optionSuppliers = [];
+                    e.data.data.map(sup => {
+                        sup.name === res.data.supplier.name
+                        ? optionSuppliers.push(<option key={sup.id} defaultValue={sup.id} selected>{sup.name}</option>)
+                        : optionSuppliers.push(<option key={sup.id} value={sup.id}>{sup.name}</option>)
+                    });
+                    setSupplierOptions(optionSuppliers);
+                })
                 setProduct(res.data);
                 setTitle(res.data.title);
                 setDescription(res.data.description);
@@ -65,8 +77,9 @@ const UpdateProduct = () => {
                 if (res.data.promo === null) setPromo(0);
                 else setPromo(res.data.promo);
                 setSubCategory(res.data.subCategory.id)
-                setSex(res.data.sex)
-                setStatus(res.data.status)
+                setSex(res.data.sex);
+                setStatus(res.data.status);
+                setSupplier(res.data.supplier.id);
             })
             .catch(error => {
                 toast.error('Error !', { position: 'top-center' });
@@ -83,19 +96,20 @@ const UpdateProduct = () => {
                 "price": parseInt(price),
                 "promo": parseInt(promo),
                 "sex": sex,
-                "status": status
+                "status": status,
+                "supplier_id": supplier
             }
             console.log(body);
 
             axios.put("http://localhost:8000/api/product/" + idProduct, body, config).then(e => {
                 toast.success('Product correctly updated!', { position: "top-center" })
             }).catch(err => {
+                console.log(err)
                 toast.error('Error !', { position: 'top-center' });
             });
         }
     }, [isReady]);
 
-    console.log(subCategory)
     return (
         <div className='container'>
             <ToastContainer />
@@ -113,13 +127,21 @@ const UpdateProduct = () => {
                     <label htmlFor="description">Description</label><br />
                     <textarea className="inputeStyle" name="description" id="description" form="formItem" placeholder="Your item description .." value={description} onChange={(e) => setDescription(e.target.value)} />
                 </div>
-                <div className="form-group">
-                    {/* <label htmlFor="category">Category</label>
-                    <input className="inputeStyle form-control" type="text" name="category" placeholder="category" value={subCategory.id} onChange={(e) => setSubCategory(e.target.value)}/> */}
-                    <select className="form-control form-control-lg" id="selectCategory" onChange={(e) => setSubCategory(parseInt(e.target.value))}>
-                        <option value="" >--- CHOICE CATEGORY ---</option>
-                        {subCategories}
-                    </select>
+                <div className="form-group row">
+                    <div className="col-sm-6">
+                        <label htmlFor="subcategory">SubCategory</label>
+                        <select className="form-control form-control-lg" name='subcategory' id="selectCategory" onChange={(e) => setSubCategory(e.target.value === "" ? null : parseInt(e.target.value))}>
+                            <option value="" >--- CHOICE SUBCATEGORY ---</option>
+                            {subCategories}
+                        </select>
+                    </div>
+                    <div className="col-sm-6">
+                        <label htmlFor="supplier">Supplier</label>
+                        <select className="form-control form-control-lg" id="supplier" name="supplier" onChange={(e) => setSupplier(e.target.value === "" ? null : parseInt(e.target.value))}>
+                            <option value="" >--- CHOICE SUPPLIER ---</option>
+                            {supplierOptions}
+                        </select>
+                    </div>
                 </div>
                 <div className="form-group">
                     <label htmlFor="price">Price</label>

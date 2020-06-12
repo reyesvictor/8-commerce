@@ -111,7 +111,7 @@ class SupplierOrderController extends AbstractController
                     $supplierOrder->setSupplier($supplier);
                 }
 
-                if(isset($req->status) && $req->status === true && $supplierOrder->getStatus() !== true) {
+                if(isset($req->status) && $req->status == true && $supplierOrder->getStatus() != true) {
                     $supplierOrderSubproduct = $supplierOrder->getSupplierOrderSubproducts();
                     foreach ($supplierOrderSubproduct as $value) {
                         $quantity = ($value->getQuantity());
@@ -122,7 +122,7 @@ class SupplierOrderController extends AbstractController
                     $supplierOrder->setStatus(true);
                 }
 
-                if(isset($req->status) && $req->status === false) $supplierOrder->setStatus(false);
+                if(isset($req->status) && $req->status == false) $supplierOrder->setStatus(false);
 
                 $error = $validator->validate($supplierOrder);
                 if (count($error) > 0) return $this->json($error, 400);

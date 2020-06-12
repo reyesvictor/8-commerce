@@ -25,3 +25,11 @@ h1 {
     margin-bottom: 0.5rem !important;
     margin-left: 0.5rem !important;
 }
+
+.paddright {
+    width: 11% !important;
+}
+
+.imgOrder {
+    padding-left: 13px;
+}

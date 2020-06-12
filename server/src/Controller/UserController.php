@@ -20,16 +20,6 @@ use ReallySimpleJWT\Token;
 class UserController extends AbstractController
 {
     /**
-     * @Route("/user", name="user")
-     */
-    public function index()
-    {
-        return $this->render('user/index.html.twig', [
-            'controller_name' => 'UserController',
-        ]);
-    }
-
-    /**
      * @Route("/register", name="register")
      */
     public function register(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
@@ -124,6 +114,15 @@ class UserController extends AbstractController
             }
             return new JsonResponse(['msg' => "the Bad token"], 400);
         }
+    }
+
+    /**
+     * @Route("/api/user/{id}/address", name="user_address", methods="GET")
+     */
+    public function userAddress(Request $request, UserRepository $userRepository)
+    {
+        $user = $userRepository->find($request->attributes->get('id'));
+        return $this->json($user, 200, [], ['groups' => 'user_address']);
     }
 
     private function createToken($user)

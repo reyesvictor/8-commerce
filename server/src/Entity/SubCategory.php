@@ -20,7 +20,7 @@ class SubCategory
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"products","category", "subcategory"})
+     * @Groups({"products","category", "subcategory", "supplier_products"})
      */
     private $id;
 
@@ -38,7 +38,7 @@ class SubCategory
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"products","category", "subcategory"})
+     * @Groups({"products","category", "subcategory", "supplier_products"})
      */
     private $name;
 
