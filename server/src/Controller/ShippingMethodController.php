@@ -26,10 +26,11 @@ class ShippingMethodController extends AbstractController
     /**
      * @Route("/api/shippingmethod", name="shippingmethod_index", methods="GET")
      */
-    public function index(ShippingMethodRepository $shippingMethodRepository)
+    public function index(Request $request, ShippingMethodRepository $shippingMethodRepository)
     {
-        $shippingMethod = $shippingMethodRepository->findAll();
-        return $this->json($shippingMethod, 200, [],['groups' => 'shipping']);
+        $count = $shippingMethodRepository->countTotalResults();
+        $shippingMethod = $shippingMethodRepository->findBy([], null, $request->query->get('limit'), $request->query->get('offset'));
+        return $this->json(['nbResults' => $count, 'data' => $shippingMethod], 200, [], ['groups' => 'shipping']);
     }
 
     /**
@@ -50,6 +51,8 @@ class ShippingMethodController extends AbstractController
      */
     public function shippingMethodCreate(Request $request ,ShippingMethodRepository $shippingMethodRepository,EntityManagerInterface $em)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $req = json_decode($request->getContent());
         
         $find = $shippingMethodRepository->findOneBy(['name' => $req->name]);
@@ -71,6 +74,8 @@ class ShippingMethodController extends AbstractController
      */
     public function shippingMethodRemove(Request $request ,ShippingMethodRepository $shippingMethodRepository,EntityManagerInterface $em)
     { 
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $shippingMethod = $shippingMethodRepository->findOneBy(['id' => $request->attributes->get('id')]);
 
         if ($shippingMethod) {
@@ -91,6 +96,8 @@ class ShippingMethodController extends AbstractController
      */
     public function shippingMethodUpdate(Request $request, EntityManagerInterface $em, ValidatorInterface $validator, ShippingMethodRepository $shippingMethodRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         try {
             $jsonContent = $request->getContent();
             $req = json_decode($jsonContent);

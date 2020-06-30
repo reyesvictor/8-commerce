@@ -4,6 +4,7 @@ import $ from "jquery";
 import axios from "axios";
 import "./SuggestionSearch.css";
 import { Dropdown, Form, Button, FormControl } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 export default class SuggestionSearch extends Component {
   constructor() {
@@ -57,7 +58,7 @@ export default class SuggestionSearch extends Component {
     const header = { "Content-Type": "application/json" };
 
     axios
-      .post("http://localhost:8000/api/product/search", request, {
+      .post(process.env.REACT_APP_API_LINK + "/api/product/search", request, {
         headers: header,
       })
       .then(async (res) => {
@@ -84,6 +85,8 @@ export default class SuggestionSearch extends Component {
   }
 
   render() {
+    const imageDefault = "https://i.ibb.co/j5qSV4j/missing.jpg";
+
     const show = this.state.show;
 
     const isDataReady = this.state.isDataReady;
@@ -154,13 +157,13 @@ export default class SuggestionSearch extends Component {
                 )}
                 {subcategories.map((subcategory) => {
                   return (
-                    <a
-                      href={"/search?subcategory=" + subcategory.name}
+                    <Link
+                      to={"/search?subcategory=" + subcategory.name}
                       className="sugg-a"
                       key={subcategory.id}
                     >
                       <div className="sugg-cat">{subcategory.name}</div>
-                    </a>
+                    </Link>
                   );
                 })}
               </div>
@@ -192,14 +195,14 @@ export default class SuggestionSearch extends Component {
               )}
               {products.map((product) => {
                 return (
-                  <a
-                    href={"/product/" + product.product_id}
+                  <Link
+                    to={"/product/" + product.product_id}
                     className="sugg-product"
                     key={product.id}
                   >
                     <div className="row p-1">
                       <img
-                        src={process.env.REACT_APP_API_LINK + product.images[0]}
+                        src={product.images ? process.env.REACT_APP_API_LINK + product.images[0] : imageDefault}
                         className="sugg-product_img col-4"
                       ></img>
                       <div className="col-8">
@@ -207,10 +210,11 @@ export default class SuggestionSearch extends Component {
                           ? product.title
                           : product.title.substr(0, 22) + "..."}
                           <br/>
-                          <span className="sugg-product_price">{product.price+" €"}</span>
+                          
+                        {product.promo > 0 ? <span className="sugg-product_price">{ product.price }€ <s className="text-danger">{ product.basePrice}€  </s> </span> : <span className="sugg-product_price">{ product.price }€  </span>} 
                       </div>
                     </div>
-                  </a>
+                  </Link>
                 );
               })}
             </div>

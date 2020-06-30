@@ -52,6 +52,8 @@ class SubProductController extends AbstractController
      */
     public function subProductCreate(Request $request, SerializerInterface $serializer, ProductRepository $productRepository, SubproductRepository $subproductRepository, EntityManagerInterface $em, ValidatorInterface $validator)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         try {
             $jsonContent = $request->getContent();
             $data = json_decode($jsonContent);
@@ -103,6 +105,8 @@ class SubProductController extends AbstractController
      */
     public function subProductUpdate(Request $request, EntityManagerInterface $em, SerializerInterface $serializer, ValidatorInterface $validator, SubproductRepository $subproductRepository, ColorRepository $colorRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         try {
             $subProduct = $subproductRepository->findOneBy(['id' => $request->attributes->get('id')]);
             if ($subProduct) {
@@ -141,6 +145,8 @@ class SubProductController extends AbstractController
      */
     public function subProductRemove(Request $request, SubproductRepository $subproductRepository, EntityManagerInterface $em)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $subproduct = $subproductRepository->findOneBy(['id' => $request->attributes->get('id')]);
 
         if ($subproduct) {

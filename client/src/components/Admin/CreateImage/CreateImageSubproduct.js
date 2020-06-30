@@ -17,16 +17,17 @@ const CreateImageSubproduct = () => {
     const config = {
         headers: {
             "Content-Type": "multipart/form-data",
+            "Authorization": 'Bearer '+token
         }
     }
 
+    // useEffect(() => {
+    //     if (token) {
+    //         config.headers['Authorization'] = 'Bearer '+token;
+    //     }
+    // }, [token]);
     useEffect(() => {
-        if (token) {
-            config.headers['x-auth-token'] = token
-        }
-    }, [token]);
-    useEffect(() => {
-        axios.get("http://127.0.0.1:8000/api/color", config).then( allColors => {
+        axios.get(process.env.REACT_APP_API_LINK + "/api/color", config).then( allColors => {
             let optionColors = [];
             allColors.data.map(colorMap => {
                 optionColors.push(<option key={colorMap.id} value={colorMap.id}>{colorMap.name}</option>)
@@ -55,7 +56,7 @@ const CreateImageSubproduct = () => {
         bodyFormData.append('color', color);
         console.log(color)
         axios
-        .post('http://127.0.0.1:8000/api/image/'+idsubproduct, bodyFormData, config)
+        .post(process.env.REACT_APP_API_LINK + '/api/image/'+idsubproduct, bodyFormData, config)
         .then(response => {
           console.log(response);
           toast.success(response.data.message, {position: 'top-center'});

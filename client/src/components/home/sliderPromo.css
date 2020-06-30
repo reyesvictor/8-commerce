@@ -1,0 +1,75 @@
+/* REGLAGE SLIDER MODULE */
+.awssld {
+  --organic-arrow-thickness: 4px;
+  --organic-arrow-height: 40px;
+  --slider-height-percentage: 40%;
+  --loader-bar-color: #851515;
+  --loader-bar-height: 6px;
+  --control-button-width: 10%;
+  --control-button-height: 25%;
+  --control-button-opacity: 0.5;
+  --control-button-hover-opacity: 0.75;
+  --control-button-background: transparent;
+  --transition-bezier: cubic-bezier(0.5, 0.075, 0.25, 0.95);
+  --slider-transition-duration: 575ms;
+  --organic-arrow-color: #6a6a6a;
+  --organic-arrow-border-radius: 0;
+  --control-button-background: transparent;
+  --control-bullet-color: #2d5182;
+  --control-bullet-active-color: #26456f;
+  --content-background-color: #ffffff;
+}
+
+.awssld__next:focus {
+  border: 0;
+  outline: none;
+  box-shadow: none;
+}
+
+.awssld__prev:focus {
+  border: 0;
+  outline: none;
+  box-shadow: none;
+}
+
+.awssld__bullets {
+  display: none;
+}
+
+.awssld__timer {
+  background-color: transparent;
+}
+
+/* STYLE */
+#slider {
+  overflow-x: hidden;
+  margin: 20px 0;
+  padding: 0;
+}
+
+.slider-bg {
+  width: 100%;
+  height: 100%;
+}
+
+
+.blur-bg {
+  filter: blur(13px);
+  -webkit-filter: blur(13px);
+  color: rgb(255, 255, 255);
+  opacity: 0.2;
+  filter: alpha(opacity=20);
+}
+
+/* .img-div {
+  height: 250px;
+  width: auto;
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgb(224, 224, 224);
+  border-radius: 3px;
+} */
+
+.img-div {
+  height: 100%;
+ 
+}

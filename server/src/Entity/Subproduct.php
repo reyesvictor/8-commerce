@@ -26,8 +26,8 @@ class Subproduct
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="subproducts")
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups({"subproduct", "supplier_order_details"})
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @Groups({"subproduct", "supplier_order_details", "user_order_details"})
      */
     private $product;
 
@@ -39,7 +39,7 @@ class Subproduct
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"products", "subproduct", "supplier_order_details", "supplier_products"})
+     * @Groups({"products", "subproduct", "supplier_order_details", "supplier_products", "user_order_details"})
      */
     private $size;
 
@@ -70,24 +70,24 @@ class Subproduct
     /**
      * @ORM\ManyToOne(targetEntity=Color::class, inversedBy="subproduct")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"subproduct","products", "supplier_order_details", "supplier_products"})
+     * @Groups({"subproduct","products", "supplier_order_details", "supplier_products", "user_order_details"})
      */
     private $color;
 
     /**
-     * @ORM\OneToMany(targetEntity=SupplierOrderSubproduct::class, mappedBy="subproduct")
+     * @ORM\OneToMany(targetEntity=SupplierOrderSubproduct::class, mappedBy="subproduct", orphanRemoval=true, cascade={"remove"}, cascade={"persist"})
      */
     private $supplierOrderSubproducts;
 
     /**
-     * @ORM\ManyToMany(targetEntity=UserOrder::class, mappedBy="subproduct")
+     * @ORM\OneToMany(targetEntity=UserOrderSubproduct::class, mappedBy="subproduct", orphanRemoval=true)
      */
-    private $userOrders;
+    private $userOrderSubproducts;
 
     public function __construct()
     {
         $this->supplierOrderSubproducts = new ArrayCollection();
-        $this->userOrders = new ArrayCollection();
+        $this->userOrderSubproducts = new ArrayCollection();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -232,28 +232,31 @@ class Subproduct
     }
 
     /**
-     * @return Collection|UserOrder[]
+     * @return Collection|UserOrderSubproduct[]
      */
-    public function getUserOrders(): Collection
+    public function getUserOrderSubproducts(): Collection
     {
-        return $this->userOrders;
+        return $this->userOrderSubproducts;
     }
 
-    public function addUserOrder(UserOrder $userOrder): self
+    public function addUserOrderSubproduct(UserOrderSubproduct $userOrderSubproduct): self
     {
-        if (!$this->userOrders->contains($userOrder)) {
-            $this->userOrders[] = $userOrder;
-            $userOrder->addSubproduct($this);
+        if (!$this->userOrderSubproducts->contains($userOrderSubproduct)) {
+            $this->userOrderSubproducts[] = $userOrderSubproduct;
+            $userOrderSubproduct->setSubproduct($this);
         }
 
         return $this;
     }
 
-    public function removeUserOrder(UserOrder $userOrder): self
+    public function removeUserOrderSubproduct(UserOrderSubproduct $userOrderSubproduct): self
     {
-        if ($this->userOrders->contains($userOrder)) {
-            $this->userOrders->removeElement($userOrder);
-            $userOrder->removeSubproduct($this);
+        if ($this->userOrderSubproducts->contains($userOrderSubproduct)) {
+            $this->userOrderSubproducts->removeElement($userOrderSubproduct);
+            // set the owning side to null (unless already changed)
+            if ($userOrderSubproduct->getSubproduct() === $this) {
+                $userOrderSubproduct->setSubproduct(null);
+            }
         }
 
         return $this;

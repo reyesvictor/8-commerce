@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
+import store from '../../../store';
 
 function CreateOrder() {
     const [idSupplier, setIdSupplier] = useState([]);
@@ -19,20 +20,29 @@ function CreateOrder() {
     const optionSelect = [];
     const optionSubProduct = [];
 
+    const token = store.getState().auth.token
     const config = {
         headers: {
-            "Content-type": "application/json"
+            "Content-type": "application/json",
+            "Authorization": 'Bearer '+token
         }
     }
+
+    // useEffect(() => {
+    //     if (token) {
+    //         config.headers['Authorization'] = 'Bearer '+token;
+    //     }
+    // }, [token]);
+    
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/api/supplier", config).then(e => {
+        axios.get(process.env.REACT_APP_API_LINK + "/api/supplier", config).then(e => {
             setAllSupplier(e.data.data);
         });
     }, []);
 
     useEffect(() => {
         if (goSelectProduct) {
-            axios.get("http://127.0.0.1:8000/api/supplier/" + idSupplier + "/products", config).then(e => {
+            axios.get(process.env.REACT_APP_API_LINK + "/api/supplier/" + idSupplier + "/products", config).then(e => {
                 if(Array.isArray(e.data.product)){
                     setAllSubproduct(e.data.product);
                 } else {
@@ -75,20 +85,20 @@ function CreateOrder() {
         let invalids = {};
 
         if (idSupplier == "") {
-            invalids.idsupplier = "PLease select a supplier";
+            invalids.idsupplier = "Please select a supplier";
         }
         if (ourAdress != "") {
             if (ourAdress.match(/[\\"/!$%^&*()_+|~=`{}[:;<>?.@#\]]/)) {
                 invalids.adress = "Invalids charactere";
             }
         } else {
-            invalids.adress = "PLease enter adress";
+            invalids.adress = "Please enter adress";
         }
         if (subProduct == "") {
             invalids.subproduct = "Select subProduct";
         }
         if (quantity.length == 0) {
-            invalids.quantity = "PLease enter quantity";
+            invalids.quantity = "Please enter quantity";
         }
 
         if (Object.keys(invalids).length === 0) {
@@ -124,7 +134,7 @@ function CreateOrder() {
         <div className="container">
             <h1>New Order</h1>
             <div className="row justify-content-end mb-2">
-                <button onClick={() => window.location.href = '/admin'} className='float-right btn btn-warning m-2'> Back to Dashboard </button>
+                <button onClick={() => window.location.href = '/admin?tab=4'} className='float-right btn btn-warning m-2'> Back to Dashboard </button>
             </div>
             <Form onSubmit={onSubmit2}>
                 <FormGroup>

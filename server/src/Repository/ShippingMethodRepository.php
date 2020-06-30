@@ -19,6 +19,14 @@ class ShippingMethodRepository extends ServiceEntityRepository
         parent::__construct($registry, ShippingMethod::class);
     }
 
+    public function countTotalResults()
+    {
+        return $this->createQueryBuilder('u')
+            ->select('count(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     // /**
     //  * @return ShippingMethod[] Returns an array of ShippingMethod objects
     //  */

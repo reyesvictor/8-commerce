@@ -34,7 +34,8 @@ class SubCategoryController extends AbstractController
      */
     public function subCategoryCreate(Request $request, EntityManagerInterface $em,SubCategoryRepository $sCategoryRepository,CategoryRepository $CategoryRepository)
     {
-        
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $Cat = $request->attributes->get('Category');
         $category = $CategoryRepository->findOneBy(['name' => $Cat]);
 
@@ -61,6 +62,8 @@ class SubCategoryController extends AbstractController
      */
     public function subCategoryRemove(Request $request, EntityManagerInterface $em,SubCategoryRepository $subcategoryRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $id = $request->attributes->get('id');
         $subcategory = $subcategoryRepository->findOneBy(['id' => $id ]);
 
@@ -92,6 +95,8 @@ class SubCategoryController extends AbstractController
      */
     public function subcategoryUpdate(Request $request, EntityManagerInterface $em, ValidatorInterface $validator, CategoryRepository $categoryRepository,SubCategoryRepository $subCategoryRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         try {
             $jsonContent = $request->getContent();
             $req = json_decode($jsonContent);
@@ -126,16 +131,18 @@ class SubCategoryController extends AbstractController
      */
     public function subCategoryMigrate(Request $request, EntityManagerInterface $em,SubCategoryRepository $subcategory,ProductRepository $productrepo)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $jsonContent = $request->getContent();
         $req = json_decode($jsonContent);
 
         $products = $productrepo->findBy(['subCategory' => $req->oldsubcategory]);
         if(!$products){
-            return $this->json(['message' => 'Products not found for this Id'], 404);
+            return $this->json(['message' => 'Nothing to migrate'], 404);
         }
         $newsubcategory = $subcategory->findOneBy(['id' => $req->newsubcategory]);
         if(!$newsubcategory){
-            return $this->json(['message' => 'SubCategory not found for this Id'], 404);
+            return $this->json(['message' => 'This subcategory doesn\'t exist'], 404);
         }
 
         foreach($products as $product){ 

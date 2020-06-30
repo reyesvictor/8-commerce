@@ -5,6 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import ReactPaginate from 'react-paginate';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import store from '../../../store';
 
 function Suppliers() {
     const [show, setShow] = useState(false);
@@ -20,21 +21,32 @@ function Suppliers() {
     const optionSelect = [];
     const [divOrder, setDivOrder] = useState([]);
 
+    const token = store.getState().auth.token
     const config = {
         headers: {
-            "Content-type": "application/json"
+            "Content-type": "application/json",
+            "Authorization": 'Bearer '+token
         }
-    };
+    }
+    // useEffect(() => {
+    //     if (token) {
+    //         config.headers['Authorization'] = 'Bearer '+token;
+    //     }
+    // }, [token]);
+    
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/api/supplier", config).then(e => {
+        axios.get(process.env.REACT_APP_API_LINK + "/api/supplier", config).then(e => {
             setAllSupplier(e.data.data);
         });
     }, []);
 
     useEffect(() => {
-        axios.get(`http://127.0.0.1:8000/api/supplier/order?offset=${offset}&limit=${limit}`, config).then(async e => {
-            await setPageCount(Math.ceil(e.data.nbResults / limit))
-            console.log(e.data.data)
+        if (postDataOrder === null) setOffset(offset - limit);
+    }, [postDataOrder])
+
+    useEffect(() => {
+        axios.get(process.env.REACT_APP_API_LINK + `/api/supplier/order?offset=${offset}&limit=${limit}`, config).then(async e => {
+            await setPageCount(Math.ceil(e.data.nbResults / limit));
             const newPostDataOrder = e.data.data.map((order) =>
                 <tr key={order.id}>
                     <td><p className="myMargin align-items-center">{order.id}</p></td>
@@ -56,7 +68,7 @@ function Suppliers() {
         const newOffset = selectedPage * limit;
         setOffset(newOffset)
     };
-    
+
     allSupplier.map(supp => {
         optionSelect.push(<option key={supp.id} value={supp.id}>{supp.name}</option>)
     });
@@ -76,21 +88,20 @@ function Suppliers() {
             return toast.error("Invalid charactere", { position: "top-center" });
         } else {
             const body = {
-                "name" : supplierName
+                "name": supplierName
             };
-            axios.post("http://127.0.0.1:8000/api/supplier", body, config).then( e => {
+            axios.post(process.env.REACT_APP_API_LINK + "/api/supplier", body, config).then(e => {
                 toast.success("Supplier correctly added !", { position: "top-center" });
                 setShow(false);
-            }).catch( err => {
-                toast.error('Error !', {position: 'top-center'});
+            }).catch(err => {
+                toast.error('Error !', { position: 'top-center' });
             });
         }
     }
 
     function showDetailsOrder(id) {
-        axios.get("http://127.0.0.1:8000/api/supplier/order/" + id, config).then(res => {
+        axios.get(process.env.REACT_APP_API_LINK + "/api/supplier/order/" + id, config).then(res => {
             setDivOrder(res.data.supplierOrderSubproducts);
-            console.log(res.data.supplierOrderSubproducts)
             setShowDetails(true);
         }).catch(error => {
             console.log(error);
@@ -101,12 +112,11 @@ function Suppliers() {
         // setShowConfirm(true)
 
         const body = {
-            "status" : true
+            "status": true
         };
-        axios.put("http://127.0.0.1:8000/api/supplier/order/" + id, body, config).then(res => {
+        axios.put(process.env.REACT_APP_API_LINK + "/api/supplier/order/" + id, body, config).then(res => {
             toast.success("Order received !", { position: "top-center" });
-            axios.get("http://127.0.0.1:8000/api/supplier/order", config).then(e => {
-                console.log(e.data.data);
+            axios.get(process.env.REACT_APP_API_LINK + "/api/supplier/order", config).then(e => {
                 const newPostDataOrder = e.data.data.map((order) =>
                     <tr key={order.id}>
                         <td><p className="myMargin align-items-center">{order.id}</p></td>
@@ -125,10 +135,9 @@ function Suppliers() {
             console.log(error);
         });
     }
-    
+
     return (
         <>
-            <ToastContainer />
             <div className="row justify-content-end mb-2">
                 <button onClick={() => window.location.href = 'admin/order'} className="btn btn-success m-1">+ New Order</button>
                 <button onClick={() => setShow(true)} className="btn btn-success m-1">+ New Supplier</button>
@@ -142,7 +151,7 @@ function Suppliers() {
                                     type="text"
                                     name="supplier"
                                     id="supplier"
-                                    onChange={onChange}/>
+                                    onChange={onChange} />
                                 <Button color="dark" className="mt-4" block>Submit</Button>
                             </FormGroup>
                         </Form>
@@ -152,30 +161,30 @@ function Suppliers() {
                     <Modal.Header closeButton>Order !</Modal.Header>
                     <Modal.Body>
                         {divOrder.length > 0 &&
-                        divOrder.map( subProduct => 
-                            <div className="divOrderCart" key={subProduct.subproduct.id}>
-                                <table className="productinCart">
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <span><b>Title:</b> { subProduct.subproduct.product.title}</span>
-                                            </td>
-                                        </tr>
-                                        
-                                        <tr className="tableborder">
-                                            <td className="detailsproduct">
-                                              <img src={`http://127.0.0.1:8000/api/image/${subProduct.subproduct.product.id}/default/1.jpg`}/>
-                                                <span><b>ID:</b> {subProduct.subproduct.id}</span>
-                                                <span><b>Color:</b> {subProduct.subproduct.color.name}</span>
-                                                <span><b>Size:</b> {subProduct.subproduct.size}</span>
-                                                <span><b>Quantity:</b> {subProduct.quantity}</span>
-                                                <span><b>Price:</b> {subProduct.subproduct.price} €</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
+                            divOrder.map(subProduct =>
+                                <div className="divOrderCart" key={subProduct.subproduct.id}>
+                                    <table className="productinCart">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <span><b>Title:</b> {subProduct.subproduct.product.title}</span>
+                                                </td>
+                                            </tr>
+
+                                            <tr className="tableborder">
+                                                <td className="detailsproduct">
+                                                    <img src={process.env.REACT_APP_API_LINK + `/api/image/${subProduct.subproduct.product.id}/default/1.jpg`} />
+                                                    <span><b>ID:</b> {subProduct.subproduct.id}</span>
+                                                    <span><b>Color:</b> {subProduct.subproduct.color.name}</span>
+                                                    <span><b>Size:</b> {subProduct.subproduct.size}</span>
+                                                    <span><b>Quantity:</b> {subProduct.quantity}</span>
+                                                    <span><b>Price:</b> {subProduct.subproduct.price} €</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         <Button color="dark" className="mt-4" block onClick={() => setShowDetails(false)}>Close</Button>
                     </Modal.Body>
                 </Modal>
@@ -188,7 +197,7 @@ function Suppliers() {
                     </Modal.Body>
                 </Modal> */}
             </div>
-            <div className="row border p-2">
+            <div className="row border  bg-light  p-2">
                 <table>
                     <thead>
                         <tr>
@@ -203,18 +212,19 @@ function Suppliers() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <div>
-                    <ReactPaginate
-                        previousLabel={"prev"}
-                        nextLabel={"next"}
-                        breakLabel={"..."}
-                        breakClassName={"break-me"}
-                        pageCount={pageCount}
-                        marginPagesDisplayed={1}
-                        pageRangeDisplayed={2}
-                        onPageChange={handlePageClick}
-                        containerClassName={"pagination"}
-                        subContainerClassName={"pages pagination"}
-                        activeClassName={"active"} />
+                    {pageCount > 0 &&
+                        <ReactPaginate
+                            previousLabel={"prev"}
+                            nextLabel={"next"}
+                            breakLabel={"..."}
+                            breakClassName={"break-me"}
+                            pageCount={pageCount}
+                            marginPagesDisplayed={1}
+                            pageRangeDisplayed={2}
+                            onPageChange={handlePageClick}
+                            containerClassName={"pagination"}
+                            subContainerClassName={"pages pagination"}
+                            activeClassName={"active"} />}
                 </div>
             </div>
         </>

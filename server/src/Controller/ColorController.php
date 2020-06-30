@@ -56,6 +56,8 @@ class ColorController extends AbstractController
      */
     public function colorCreate(Request $request,EntityManagerInterface $em, ValidatorInterface $validator, ColorRepository $colorRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $jsonContent = $request->getContent();
         $req = json_decode($jsonContent);
         $oldColor = $colorRepository->findOneBy(['name' => $request->attributes->get("color") ]);
@@ -84,6 +86,8 @@ class ColorController extends AbstractController
      */
     public function colorRemove(Request $request,EntityManagerInterface $em,ColorRepository $colorRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $id = $request->attributes->get('id');
         $color = $colorRepository->findOneBy(['id' => $id ]);
 
@@ -102,6 +106,8 @@ class ColorController extends AbstractController
      */
     public function colorUpdate(Request $request,EntityManagerInterface $em, ValidatorInterface $validator, ColorRepository $colorRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        
         $jsonContent = $request->getContent();
         $req = json_decode($jsonContent);
         $newColor = $colorRepository->findOneBy(['name' => $req->name ]);

@@ -17,7 +17,10 @@ import {
 import Product from './components/products/product.details';
 import Panier from './components/panier/panier';
 import Home from './components/home/home';
+import Commands from './components/commands/inputCommand';
+import Command from './components/commands/idCommand';
 import AccessAdmin from './components/Admin/AccessAdmin';
+import AccessUser from './components/user/AccessUser';
 import NotFound from './components/NotFound/NotFound';
 // import AccessCreateCategory from './components/Admin/CreateCategory/AccessCreateCategory';
 // import AccessCreateSubCategory from './components/Admin/CreateCategorySub/AccessCreateSubCategory';
@@ -33,7 +36,10 @@ import CreateImageSubproduct from './components/Admin/CreateImage/CreateImageSub
 import AccessUpdateCategory from './components/Admin/UpdateCategory/AccessUpdateCategory';
 import AccessUpdateSubCategory from './components/Admin/UpdateSubCategory/AccessUpdateSubCategoy';
 import AccessCreateOrder from './components/Admin/CreateOrder/AccessCreateOrder';
-
+import AccessCreateShipping from './components/Admin/CreateShipping/AccessCreateShipping';
+import AccessUpdateShipping from './components/Admin/UpdateShipping/AccessUpdateShipping';
+import Questions from './components/Q&A/q&a';
+import Techlab from './components/Techlab/Techlab';
 
 class App extends React.Component {
 
@@ -42,29 +48,36 @@ class App extends React.Component {
     }
 
     render() {
-        console.log(store.getState().auth);
+        // console.log(store.getState().auth);
         return (
             <Provider store={store}>
                 <Router>
                 <IndexNavbar />
                     <Switch>
                         <Route exact path="/" component={Home} />
+                        <Route exact path="/techlab" component={Techlab} />
+                        <Route exact path="/command" component={Commands} />
+                        <Route exact path="/command/:id" component={Command} />
                         <Route exact path="/panier" component={Panier} />
                         <Route exact path="/product/:id" component={Product} />
                         <Route exact path="/search" component={SearchSidebar} />
+                        <Route exact path="/user" component={AccessUser} />
                         <Route exact path="/admin" component={AccessAdmin} />
+                        <Route exact path="/questions" component={Questions} />
                         <Route exact path="/admin/order"component={AccessCreateOrder} />
                         <Route exact path="/admin/subcategory/:id"component={AccessSubCategoryInterface} />
                         <Route exact path="/admin/subproduct/:id" component={AccessSubProductInterface} />
                         <Route exact path="/admin/subproduct/:id/create" component={AccessCreateSubProduct} />
                         <Route exact path="/admin/subproduct/:id/:subproduct/update" component={AccessUpdateSubProduct} />
                         <Route exact path="/admin/create/product" component={AccessCreateProduct} />
+                        <Route exact path="/admin/create/shipping" component={AccessCreateShipping} />
                         {/* <Route exact path="/admin/create/category" component={AccessCreateCategory} />
                         <Route exact path="/admin/create/subcategory" component={AccessCreateSubCategory} /> */}
                         <Route exact path="/admin/create/image/:idproduct" component={CreateImage} />
                         <Route exact path="/admin/create/image/:idproduct/:idsubproduct" component={CreateImageSubproduct} />
                         <Route exact path="/admin/update/product/:id" component={AccessUpdateProduct} />
                         <Route exact path="/admin/update/category/:id" component={AccessUpdateCategory} />
+                        <Route exact path="/admin/update/shipping/:id" component={AccessUpdateShipping} />
                         <Route path='*' exact={true} component={NotFound} />
                     </Switch>
                 </Router>

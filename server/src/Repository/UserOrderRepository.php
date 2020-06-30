@@ -36,6 +36,75 @@ class UserOrderRepository extends ServiceEntityRepository
     }
     */
 
+    //SELECT COUNT(user_id) FROM user_order WHERE user_id IS NOT NULL 
+
+
+    public function countRegisteredBuyersResults()
+    {
+        return $this->createQueryBuilder('u')
+            ->select('count(DISTINCT u.user)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countUnregisteredBuyersResults()
+    {
+        $conn = $this->getEntityManager()
+            ->getConnection();
+        $sql = "SELECT COUNT(id) as unregistered_buyers FROM user_order WHERE user_id IS NULL";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    public function countAllOrders()
+    {
+        return $this->createQueryBuilder('u')
+            ->select('count(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countTotalPrice()
+    {
+        return $this->createQueryBuilder('u')
+            ->select('sum(u.cost)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countTotalProductsSold()
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.userOrderSubproducts', 'uos')
+            ->select('count(uos.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countOrdersPerRegion()
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.addressBilling', 'ab')
+            ->leftJoin('ab.region', 'r')
+            ->select('count(r.name) as nb_orders, r.name')
+            ->groupBy('r.name')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countNbProductsPerOrders()
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.userOrderSubproducts', 'uos')
+            ->select('count(uos.id) as nb_products')
+            ->groupBy('uos.userOrder')
+            ->getQuery()
+            ->getResult();
+    }
+
+    // SELECT COUNT(id) FROM user_order WHERE user_id IS NULL
+
     /*
     public function findOneBySomeField($value): ?UserOrder
     {

@@ -84,19 +84,19 @@ class ProductRepository extends ServiceEntityRepository
         LEFT JOIN sub_category ON product.sub_category_id = sub_category.id
         LEFT JOIN category ON sub_category.category_id = category.id WHERE ";
         $arrayExecute = [];
-        if ($data['search']) {
+        if (isset($data['search']) && $data['search']) {
             $query .= ' (product.title REGEXP ? OR product.description REGEXP ?) AND ';
             array_push($arrayExecute, $data['search'], $data['search']);
         }
-        if ($data['price']) {
+        if (isset($data['price']) && $data['price']) {
             $query .= ' (subproduct.price > ? AND subproduct.price < ?) AND ';
             array_push($arrayExecute, $data['price']['start'], $data['price']['end']);
         }
-        if ($data['sex']) {
+        if (isset($data['sex']) && $data['sex']) {
             $query .= ' product.sex = ? AND ';
             array_push($arrayExecute, $data['sex']);
         }
-        if ($data['size']) {
+        if (isset($data['size']) && $data['size']) {
             $query .= '(';
             foreach ($data['size'] as $key => $value) {
                 $query .= ' subproduct.size = ? OR ';
@@ -105,7 +105,7 @@ class ProductRepository extends ServiceEntityRepository
             $query = substr($query, 0, -3);
             $query .= ') AND ';
         }
-        if ($data['color']) {
+        if (isset($data['color']) && $data['color']) {
             $query .= '(';
             foreach ($data['color'] as $key => $value) {
                 $query .= ' color.name = ? OR ';
@@ -114,11 +114,11 @@ class ProductRepository extends ServiceEntityRepository
             $query = substr($query, 0, -3);
             $query .= ') AND ';
         }
-        if ($data['category']) {
+        if (isset($data['category']) && $data['category']) {
             $query .= ' category.name = ? AND ';
             array_push($arrayExecute, $data['category']);
         }
-        if ($data['subcategory']) {
+        if (isset($data['subcategory']) && $data['subcategory']) {
             $query .= ' sub_category.name = ?  ';
             array_push($arrayExecute, $data['subcategory']);
         }
@@ -129,7 +129,7 @@ class ProductRepository extends ServiceEntityRepository
             $query = substr($query, 0, -4);
         }
         $query .= ' GROUP BY product.id ';
-        if ($data['order_by']) {
+        if (isset($data['order_by']) && $data['order_by']) {
             switch ($data['order_by']) {
                 case 'popularity':
                     $query .= ' ORDER BY product.clicks ';
@@ -142,7 +142,7 @@ class ProductRepository extends ServiceEntityRepository
                     break;
             }
         }
-        if ($data['order_by_sort'] == "desc") {
+        if (isset($data['order_by_sort']) && $data['order_by_sort'] == "desc") {
             $query .= ' DESC ';
         } else {
             $query .= ' ASC ';

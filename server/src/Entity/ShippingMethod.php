@@ -28,7 +28,7 @@ class ShippingMethod
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity=ShippingPricing::class, mappedBy="shippingMethod")
+     * @ORM\OneToMany(targetEntity=ShippingPricing::class, mappedBy="shippingMethod",orphanRemoval=true, cascade={"persist", "remove"}))
      * @Groups({"shipping"})
      */
     private $shippingPricings;

@@ -5,7 +5,7 @@ import axios from 'axios'
 // get all posts
 export const getUsers = () => dispatch => {
     dispatch(setUsersLoading())
-    axios.get('http://127.0.0.1:8000/api/users')
+    axios.get(process.env.REACT_APP_API_LINK + '/api/users')
         .then(res =>
             dispatch({
                 type: GET_USERS,

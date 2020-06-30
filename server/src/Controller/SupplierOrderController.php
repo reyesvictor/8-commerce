@@ -27,6 +27,8 @@ class SupplierOrderController extends AbstractController
      */
     public function index(Request $request, NormalizerInterface $normalizer, SupplierOrderRepository $supplierOrderRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $count = $supplierOrderRepository->countAllResults();
         $supplierOrders = $supplierOrderRepository->findBy([], null, $request->query->get('limit'), $request->query->get('offset'));
         $supplierOrders = $normalizer->normalize($supplierOrders, null, ['groups' => 'supplierOrders']);
@@ -39,6 +41,8 @@ class SupplierOrderController extends AbstractController
      */
     public function supplierOrderDetails(Request $request, SupplierOrderRepository $supplierOrderRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $supplierOrder = $supplierOrderRepository->find($request->attributes->get('id'));
 
         if ($supplierOrder) {
@@ -53,6 +57,8 @@ class SupplierOrderController extends AbstractController
      */
     public function supplierOrderCreate(Request $request, EntityManagerInterface $em, SerializerInterface $serializer, ValidatorInterface $validator)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         try {
             $jsonContent = $request->getContent();
             $req = json_decode($jsonContent);
@@ -89,6 +95,8 @@ class SupplierOrderController extends AbstractController
      */
     public function supplierOrderUpdate(Request $request, EntityManagerInterface $em, ValidatorInterface $validator, SerializerInterface $serializer, SupplierOrderRepository $supplierOrderRepository, SubproductRepository $subproductRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         try {
             $supplierOrder = $supplierOrderRepository->findOneBy(['id' => $request->attributes->get('id')]);;
             if ($supplierOrder) {
@@ -143,6 +151,8 @@ class SupplierOrderController extends AbstractController
      * @Route("/api/supplier/order/{id}/add", name="supplier_order_add_subproduct", methods="POST", requirements={"id":"\d+"})
      */
     public function supplierOderAddSubproduct(Request $request, EntityManagerInterface $em, SupplierOrderRepository $supplierOrderRepository, SubproductRepository $subproductRepository) {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $jsonContent = $request->getContent();
         $req = json_decode($jsonContent);
 
@@ -172,6 +182,8 @@ class SupplierOrderController extends AbstractController
      */
     public function supplierRemove(Request $request, SupplierOrderRepository $supplierOrderRepository, EntityManagerInterface $em)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $supplierOrder = $supplierOrderRepository->findOneBy(['id' => $request->attributes->get('id')]);
 
         if ($supplierOrder) {

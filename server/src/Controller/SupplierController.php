@@ -22,6 +22,8 @@ class SupplierController extends AbstractController
      */
     public function index(Request $request, NormalizerInterface $normalizer, SupplierRepository $supplierRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $count = $supplierRepository->countAllResults();
         $supplierOrders = $supplierRepository->findBy([], null, $request->query->get('limit'), $request->query->get('offset'));
         $supplierOrders = $normalizer->normalize($supplierOrders, null, ['groups' => 'supplier']);
@@ -34,6 +36,8 @@ class SupplierController extends AbstractController
      */
     public function supplierDetails(Request $request, SupplierRepository $supplierRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $supplier = $supplierRepository->findOneBy(['id' => $request->attributes->get('id')]);
         if ($supplier) {
             return $this->json($supplier, 200, [], ['groups' => 'supplier_details']);
@@ -47,6 +51,8 @@ class SupplierController extends AbstractController
      */
     public function supplierProducts(Request $request, SupplierRepository $supplierRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $supplier = $supplierRepository->findOneBy(['id' => $request->attributes->get('id')]);
         if ($supplier) {
             return $this->json($supplier, 200, [], ['groups' => 'supplier_products']);
@@ -60,6 +66,8 @@ class SupplierController extends AbstractController
      */
     public function supplierCreate(Request $request, EntityManagerInterface $em, SerializerInterface $serializer, ValidatorInterface $validator)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $jsonContent = $request->getContent();
         try {
             $supplier = $serializer->deserialize($jsonContent, Supplier::class, 'json', [AbstractNormalizer::IGNORED_ATTRIBUTES => ['supplierOrders']]);
@@ -81,6 +89,8 @@ class SupplierController extends AbstractController
      */
     public function supplierUpdate(Request $request, EntityManagerInterface $em, ValidatorInterface $validator, SerializerInterface $serializer, SupplierRepository $supplierRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         try {
             $supplier = $supplierRepository->findOneBy(['id' => $request->attributes->get('id')]);;
             if ($supplier) {
@@ -117,6 +127,8 @@ class SupplierController extends AbstractController
      */
     public function supplierRemove(Request $request, SupplierRepository $supplierRepository, EntityManagerInterface $em)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $supplier = $supplierRepository->findOneBy(['id' => $request->attributes->get('id')]);
 
         if ($supplier) {

@@ -1,0 +1,113 @@
+/* -- REVIEWS -- */
+.comment-div {
+  margin: 5em 0;
+}
+
+.pad-15 {
+  padding: 0 15px!important;
+}
+
+/* Reviews */
+.row-rev {
+  vertical-align: top;
+  padding: 2vh 5vw;
+  margin: 2vh 0;
+  /* border-bottom: 1px solid rgba(224, 224, 224, 0.438); */
+}
+
+.rew_name {
+  font-size: 18px;
+  padding-top: 5px;
+}
+
+.rew_title {
+  font-size: 20px;
+}
+
+.rew_desc {
+  font-size: 16px;
+}
+
+/* Replies to Reviews */
+.row-rep {
+  vertical-align: top;
+  padding-right: 5vw;
+  padding-left: 7vw;
+  margin-top: 1vh;
+  /* border-bottom: 1px solid rgba(224, 224, 224, 0.438); */
+}
+
+.border-rep {
+  border-left: 1px solid rgb(224, 224, 224);
+}
+
+.rep-caption {
+  padding-left: 7vw;
+  color:  rgb(185, 185, 185);
+}
+
+.rep_name {
+  font-size: 14px;
+  padding-top: 5px;
+  margin-bottom: 2px!important;
+}
+
+.rep_title {
+  font-size: 16px;
+}
+
+.rep_desc {
+  font-size: 12px;
+}
+
+
+/* Reviews autres */
+.verif {
+  font-size: 12px;
+  color: gray;
+}
+
+.verif i {
+  font-size: 12px!important;
+}
+
+.rate-header {
+  font-size: 30px;
+}
+
+.rate-global {
+  font-size: 50px;
+}
+
+.rate-caption {
+  font-size: 12px;
+}
+
+
+/* animation from */
+.form-enter {
+  opacity: 0;
+}
+.form-enter-active {
+  opacity: 1;
+  transition: opacity 800ms;
+}
+.form-exit {
+  opacity: 0;
+}
+.form-exit-active {
+  opacity: 0;
+}
+
+
+
+
+/* -- SUGGESTIONS -- */
+.sugg-div-product {
+  border-bottom: 1px solid rgba(224, 224, 224);
+}
+
+
+.share-div rect {
+  fill: white;
+}

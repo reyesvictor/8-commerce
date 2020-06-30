@@ -22,6 +22,7 @@ const UpdateProduct = () => {
     const [subCategory, setSubCategory] = useState(1);
     const [sex, setSex] = useState('');
     const [status, setStatus] = useState(false);
+    const [promoted, setPromoted] = useState(false);
     const [allCategory, setAllCategory] = useState([]);
     const [subCategories, setSubCategories] = useState(1);
     const token = store.getState().auth.token;
@@ -29,13 +30,13 @@ const UpdateProduct = () => {
     const [supplierOptions, setSupplierOptions] = useState([]);
     const config = {
         headers: {
-            "Content-type": "application/json"
+            "Content-type": "application/json",
+            "Authorization": 'Bearer '+token
         }
     }
-
     useEffect(() => {
         if (token) {
-            config.headers['x-auth-token'] = token
+            config.headers['Authorization'] = 'Bearer '+token;
         }
     }, [token]);
 
@@ -46,12 +47,12 @@ const UpdateProduct = () => {
         setIsReady(true);
     }
     useEffect(() => {
-        axios.get("http://localhost:8000/api/product/" + idProduct, config)
+        axios.get(process.env.REACT_APP_API_LINK + "/api/product/" + idProduct, config)
             .then(async res => {
 
                 console.log(res.data);
 
-                await axios.get("http://127.0.0.1:8000/api/subcategory", config).then(e => {
+                await axios.get(process.env.REACT_APP_API_LINK + "/api/subcategory", config).then(e => {
                     setAllCategory(e.data);
                     const optionCategory = [];
                     e.data.map(category => {
@@ -61,7 +62,7 @@ const UpdateProduct = () => {
                     });
                     setSubCategories(optionCategory)
                 });
-                await axios.get("http://localhost:8000/api/supplier/").then((e) => {
+                await axios.get(process.env.REACT_APP_API_LINK + "/api/supplier/", config).then((e) => {
                     const optionSuppliers = [];
                     e.data.data.map(sup => {
                         sup.name === res.data.supplier.name
@@ -79,6 +80,7 @@ const UpdateProduct = () => {
                 setSubCategory(res.data.subCategory.id)
                 setSex(res.data.sex);
                 setStatus(res.data.status);
+                setPromoted(res.data.promoted);
                 setSupplier(res.data.supplier.id);
             })
             .catch(error => {
@@ -97,11 +99,12 @@ const UpdateProduct = () => {
                 "promo": parseInt(promo),
                 "sex": sex,
                 "status": status,
+                "promoted": promoted,
                 "supplier_id": supplier
             }
             console.log(body);
 
-            axios.put("http://localhost:8000/api/product/" + idProduct, body, config).then(e => {
+            axios.put(process.env.REACT_APP_API_LINK + "/api/product/" + idProduct, body, config).then(e => {
                 toast.success('Product correctly updated!', { position: "top-center" })
             }).catch(err => {
                 console.log(err)
@@ -116,7 +119,7 @@ const UpdateProduct = () => {
             <h1 className="text-center">Update your Product<br /><b>{title}</b></h1>
             <div className="row justify-content-end mb-2">
                 <button onClick={() => window.location.href = '/admin/subproduct/' + idProduct} className="btn btn-outline-dark m-2"> View subproducts </button>
-                <button onClick={() => window.location.href = '/admin'} className='btn btn-warning m-2'> Back to Dashboard </button>
+                <button onClick={() => window.location.href = '/admin?tab=1'} className='btn btn-warning m-2'> Back to Dashboard </button>
             </div>
             <form id="formItem">
                 <div className="form-group">
@@ -154,6 +157,10 @@ const UpdateProduct = () => {
                 <div className="form-group">
                     <label htmlFor="status">Active</label>
                     <input type="checkbox" className="ml-2" id="status" onChange={() => setStatus(!status)} checked={status} />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="promoted">Promoted</label>
+                    <input type="checkbox" className="ml-2" id="promoted" onChange={() => setPromoted(!promoted)} checked={promoted} />
                 </div>
                 <div className="row divBtnSex">
                     <input type="button" className={`btn btn-ligt mr-5 ${sex == "F" ? "css-man" : ''}`} id="Women" value="Women" onClick={() => setBtnSex("F") + setSex("F")} />

@@ -32,26 +32,25 @@ function UpdateSubProduct() {
     const token = store.getState().auth.token
     const config = {
         headers: {
-                "Content-type": "application/json"
+            "Content-type": "application/json",
+            "Authorization": 'Bearer '+token
         }
     }
+    // useEffect(() => {
+    //     if (token) {
+    //         config.headers['Authorization'] = 'Bearer '+token;
+    //     }
+    // }, [token]);
     
     const lauch = (e) =>{
         e.preventDefault()
         setIsReady(true);
     }
-
-    useEffect(() => {
-        if (token) {
-            
-            config.headers['x-auth-token'] = token
-        }
-    }, [token]);
     
     useEffect(() => {
-        axios.get("http://localhost:8000/api/product/"+id, config)
+        axios.get(process.env.REACT_APP_API_LINK + "/api/product/"+id, config)
         .then(async res => {
-            await axios.get("http://127.0.0.1:8000/api/color", config).then( allColors => {
+            await axios.get(process.env.REACT_APP_API_LINK + "/api/color", config).then( allColors => {
                 $.each(res.data.subproducts, (index, subproduct) => {
                     if(subproduct.id === parseInt(idSubproduct))
                     {
@@ -95,7 +94,7 @@ function UpdateSubProduct() {
                 "stock": parseInt(stock)
             }
             console.log(body);
-            axios.put("http://127.0.0.1:8000/api/subproduct/"+idSubproduct, body, config).then( e => {
+            axios.put(process.env.REACT_APP_API_LINK + "/api/subproduct/"+idSubproduct, body, config).then( e => {
                 toast.success('Product correctly updated!', { position: "top-center"});
             }).catch( err => {
                 toast.error('Error !', {position: 'top-center'});
@@ -107,7 +106,7 @@ function UpdateSubProduct() {
             <ToastContainer />
             <h1 className="text-center">Update the Subproduct<br/><b>{titleProduct}</b></h1>
             <div className="row justify-content-end mb-2">
-            <button onClick={() => window.location.href='/admin'} className='float-right btn btn-warning m-2'> Back to Dashboard </button>
+            <button onClick={() => window.location.href='/admin?tab=1'} className='float-right btn btn-warning m-2'> Back to Dashboard </button>
             <button onClick={() => window.location.href='/admin/subproduct/'+id} className='float-right btn btn-info m-2'> Back to the Subproduct </button>
             </div>
             <form id="formItem">

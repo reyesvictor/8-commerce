@@ -19,21 +19,25 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"user","review"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Groups({"user","review"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=180, unique=false,nullable=true)
+     * @Groups({"user","review"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=180, unique=false,nullable=true)
+     * @Groups({"user","review"})
      */
     private $lastname;
 
@@ -50,6 +54,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"user"})
      */
     private $created_at;
 
@@ -72,11 +77,24 @@ class User implements UserInterface
      */
     private $addressBillings;
 
+    /**
+     * @ORM\OneToMany(targetEntity=UserOrder::class, mappedBy="user")
+     * @Groups({"user_orders"})
+     */
+    private $userOrders;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Review::class, mappedBy="user")
+     */
+    private $reviews;
+
     public function __construct()
     {
         $this->cardCredentials = new ArrayCollection();
         $this->addressShippings = new ArrayCollection();
         $this->addressBillings = new ArrayCollection();
+        $this->userOrders = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -101,11 +119,6 @@ class User implements UserInterface
      *
      * @see UserInterface
      */
-
-    public function getUsername(): string
-    {
-        return (string) $this->username;
-    }
 
     public function getFirstName(): string
     {
@@ -150,6 +163,8 @@ class User implements UserInterface
 
         return $this;
     }
+    
+    public function getUsername() {}
 
     /**
      * @see UserInterface
@@ -282,6 +297,68 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($addressBilling->getUser() === $this) {
                 $addressBilling->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserOrder[]
+     */
+    public function getUserOrders(): Collection
+    {
+        return $this->userOrders;
+    }
+
+    public function addUserOrder(UserOrder $userOrder): self
+    {
+        if (!$this->userOrders->contains($userOrder)) {
+            $this->userOrders[] = $userOrder;
+            $userOrder->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserOrder(UserOrder $userOrder): self
+    {
+        if ($this->userOrders->contains($userOrder)) {
+            $this->userOrders->removeElement($userOrder);
+            // set the owning side to null (unless already changed)
+            if ($userOrder->getUser() === $this) {
+                $userOrder->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Review[]
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(Review $review): self
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews[] = $review;
+            $review->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): self
+    {
+        if ($this->reviews->contains($review)) {
+            $this->reviews->removeElement($review);
+            // set the owning side to null (unless already changed)
+            if ($review->getUser() === $this) {
+                $review->setUser(null);
             }
         }
 

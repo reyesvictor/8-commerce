@@ -36,6 +36,33 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
+    public function countOrdersById($id)
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.userOrders', 'o')
+            ->select('count(o.id) as orderNumber')
+            ->andWhere('u.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findUserProductById($userId, $productId)
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.userOrders', 'o')
+            ->leftJoin('o.userOrderSubproducts', 'uos')
+            ->leftJoin('uos.subproduct', 'sp')
+            ->leftJoin('sp.product', 'p')
+            ->select('p.id, p.title')
+            ->andWhere('u.id = :userid')
+            ->andWhere('p.id = :productid')
+            ->setParameter('userid', $userId)
+            ->setParameter('productid', $productId)
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return User[] Returns an array of User objects
     //  */

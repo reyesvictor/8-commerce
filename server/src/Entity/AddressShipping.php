@@ -6,6 +6,8 @@ use App\Repository\AddressShippingRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -24,31 +26,31 @@ class AddressShipping
     /**
      * @ORM\ManyToOne(targetEntity=Region::class, inversedBy="addressShippings")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"user_address"})
+     * @Groups({"user_address", "user_order_details"})
      */
     private $region;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_address"})
+     * @Groups({"user_address", "user_order_details"})
      */
     private $country;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_address"})
+     * @Groups({"user_address", "user_order_details"})
      */
     private $city;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_address"})
+     * @Groups({"user_address", "user_order_details"})
      */
     private $postcode;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_address"})
+     * @Groups({"user_address", "user_order_details"})
      */
     private $address;
 
@@ -64,19 +66,29 @@ class AddressShipping
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_address"})
+     * @Groups({"user_address", "user_order_details"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_address"})
+     * @Groups({"user_address", "user_order_details"})
      */
     private $lastname;
 
     public function __construct()
     {
         $this->userOrders = new ArrayCollection();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('country', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('city', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('postcode', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('address', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('firstname', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('lastname', new Assert\NotBlank());
     }
 
     public function getId(): ?int

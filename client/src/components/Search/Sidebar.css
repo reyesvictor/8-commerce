@@ -26,6 +26,10 @@
   transition: width 0.6s cubic-bezier(0.52, -0.43, 0.47, 1.29);
 }
 
+.icon-filter {
+  font-size: 20px!important;
+}
+
 
 /* FILTER BOX */
 #filter-div {
@@ -108,4 +112,20 @@
 @keyframes slideRightToLeft {
   from {transform: translateX(0vw)} 
   to {transform: translateX(-20vw)}
+}
+
+
+/* ANIMATION RESULTS */
+.results-enter {
+  opacity: 0;
+}
+.results-enter-active {
+  opacity: 1;
+  transition: opacity 200ms 400ms;
+}
+.results-exit {
+  opacity: 0;
+}
+.results-exit-active {
+  opacity: 0;
 }

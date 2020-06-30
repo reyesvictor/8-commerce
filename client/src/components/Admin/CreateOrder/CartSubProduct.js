@@ -3,6 +3,7 @@ import "./CreateOrder.css";
 import 'react-toastify/dist/ReactToastify.css';
 import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
+import store from '../../../store';
 
 function Cart(props) {
     const [isInvalid, setIsInvalid] = useState(false);
@@ -12,12 +13,20 @@ function Cart(props) {
     const nbrPrice = [];
     let sumProduct = 0;
     let sumPrice = 0;
+    const supplierOrder = [];
+    const token = store.getState().auth.token
     const config = {
         headers: {
-            "Content-type": "application/json"
+            "Content-type": "application/json",
+            "Authorization": 'Bearer '+token
         }
-    };
-    const supplierOrder = [];
+    }
+
+    // useEffect(() => {
+    //     if (token) {
+    //         config.headers['Authorization'] = 'Bearer '+token;
+    //     }
+    // }, [token]);
 
     useEffect(() => {
         if(props.handleCart && props.handleCart.length !== countProps) {
@@ -69,7 +78,7 @@ function Cart(props) {
                         <tbody>
                             <tr>
                                 <td rowSpan="3" className="tableborder paddright">
-                                    <img className="imgOrder" src={`http://127.0.0.1:8000/api/image/${e.idProduct}/default/1.jpg`}/>
+                                    <img className="imgOrder" src={process.env.REACT_APP_API_LINK + `/api/image/${e.idProduct}/default/1.jpg`}/>
                                 </td>
                                 <td>
                                     <span><b>Title:</b> { e.subProductTitle}</span>
@@ -106,14 +115,14 @@ function Cart(props) {
                 setIsInvalid(invalids);
             } else {
                 setIsInvalid(invalids);
-                axios.post("http://127.0.0.1:8000/api/supplier/order", obj, config).then( res => {
+                axios.post(process.env.REACT_APP_API_LINK + "/api/supplier/order", obj, config).then( res => {
                     let count = 0;
                     supplierOrder.map(order => {
                         const body = {
                             "subproduct_id" : order.subproduct_id,
                             "quantity" : order.quantity
                         };
-                        axios.post(`http://127.0.0.1:8000/api/supplier/order/${res.data.SupplierOrder.id}/add`, body, config).then(e => {
+                        axios.post(process.env.REACT_APP_API_LINK + `/api/supplier/order/${res.data.SupplierOrder.id}/add`, body, config).then(e => {
                             count++;
                             if (count == supplierOrder.length) {
                                 window.location.reload();

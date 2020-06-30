@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux'
 import PropTypes from "prop-types";
 import { Spinner } from 'react-bootstrap'
@@ -7,13 +7,13 @@ import CreateOrder from './CreateOrder';
 const AccessCreateOrder = ({auth}) => {
   
   if (!auth.authenticated && !auth.isLoading) {
-    if (auth.user !== null && auth.user.role === 'admin') {
+    if (auth.user !== null && auth.user.role.includes('ROLE_ADMIN')) {
       return (
         <CreateOrder />
       )
     }
     else {
-      return (<div id='error403'> <h2> Error page 403 access forbiden </h2></div>)
+      return (<div id='error403'> <h2> Error page 403 access forbidden </h2></div>)
     }
   }
   else {

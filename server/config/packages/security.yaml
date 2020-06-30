@@ -10,10 +10,50 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        jwt:
+            lexik_jwt: ~
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
+        register:
+            pattern:  ^/register
+            stateless: true
+            anonymous: true
+        
+        image:
+            pattern:  ^/api/image
+            stateless: true
+            anonymous: lazy
+
+        login:
+            pattern:  ^/api/login
+            stateless: true
+            anonymous: true
+            provider: app_user_provider
+            json_login:
+                check_path:               /api/login_check
+                username_path:            email
+                success_handler:          lexik_jwt_authentication.handler.authentication_success
+                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+
+        api:
+            pattern:   ^/api
+            stateless: true
+            anonymous: lazy
+            provider: app_user_provider
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator
+        
+        google:
+            pattern: ^/connect/google/check
+            provider: app_user_provider
+            guard:
+                authenticators:
+                    - App\Security\GoogleGuard
+
         main:
             anonymous: lazy
             provider: app_user_provider
@@ -27,5 +67,7 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        # - { path: ^/api/image, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        # - { path: ^/api/admin,       roles: ROLE_ADMIN }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

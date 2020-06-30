@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Validator\Constraints\Json;
 
 class CategoryController extends AbstractController
 {
@@ -108,7 +109,7 @@ class CategoryController extends AbstractController
                 }
 
                 $error = $validator->validate($category);
-                if (count($error) > 0) return $this->json($error, 400);
+                if (count($error) > 0) return $this->json($error, 404);
                 $em->persist($category);
                 $em->flush();
 
@@ -140,11 +141,11 @@ class CategoryController extends AbstractController
 
         $subcategories = $subcategory->findBy(['Category' => $req->oldcategory]);
         if(!$subcategories){
-            return $this->json(['message' => 'SubCategory not found for this Id'], 404);
+            return new JsonResponse(['message' => 'Nothing to migrate'], 400);
         }
         $newcategory = $categoryrepo->findOneBy(['id' => $req->newcategory]);
         if(!$newcategory){
-            return $this->json(['message' => 'Category not found for this Id'], 404);
+            return $this->json(['message' => 'This category doesn\'t exist'], 404);
         }
 
         foreach($subcategories as $subcategory){ 

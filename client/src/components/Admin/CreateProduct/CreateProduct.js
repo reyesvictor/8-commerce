@@ -13,6 +13,7 @@ function CreateProduct() {
     const [formControl, setFormControl] = useState({"subcategory": 1, "supplier": 1});
     const [isReady, setIsReady] = useState(false);
     const [statusState, setStatusState] = useState(true);
+    const [promotedState, setPromotedState] = useState(false);
     const [isInvalid, setIsInvalid] = useState(false);
     const [subcategories, setSubCategories] = useState([]);
     const [supplier, setSupplier] = useState([]);
@@ -31,17 +32,18 @@ function CreateProduct() {
     const token = store.getState().auth.token
     const config = {
         headers: {
-            "Content-type": "application/json"
+            "Content-type": "application/json",
+            "Authorization": 'Bearer '+token
         }
     }
-    useEffect(() => {
-        if (token) {
-            config.headers['x-auth-token'] = token
-        }
-    }, [token]);
+    // useEffect(() => {
+    //     if (token) {
+    //         config.headers['Authorization'] = 'Bearer '+token;
+    //     }
+    // }, [token]);
 
     useEffect(() => {
-      axios.get("http://127.0.0.1:8000/api/product", config).then( e => {
+      axios.get(process.env.REACT_APP_API_LINK + "/api/product", config).then( e => {
             let nbr = e.data.data[e.data.nbResults-1].id
             setCountProduct(nbr);
             }).catch( err => {
@@ -52,7 +54,7 @@ function CreateProduct() {
     useEffect(() => {
         if (show === false) {
             axios
-            .get("http://localhost:8000/api/subcategory/")
+            .get(process.env.REACT_APP_API_LINK + "/api/subcategory/", config)
             .then((res) => {
                 console.log(res.data);
                 setSubCategories(res.data);
@@ -66,7 +68,7 @@ function CreateProduct() {
 
     useEffect(() => {
         axios
-            .get("http://localhost:8000/api/subcategory/")
+            .get(process.env.REACT_APP_API_LINK + "/api/subcategory/", config)
             .then((res) => {
                 console.log(res.data);
                 setSubCategories(res.data);
@@ -79,7 +81,7 @@ function CreateProduct() {
 
     useEffect(() => {
         axios
-            .get("http://localhost:8000/api/supplier/")
+            .get(process.env.REACT_APP_API_LINK + "/api/supplier/", config)
             .then((res) => {
                 console.log(res.data.data);
                 setSupplier(res.data.data);
@@ -125,7 +127,7 @@ function CreateProduct() {
             } else {
                 let str = formControl.title.toLowerCase();
                 let title = str.charAt(0).toUpperCase() + str.slice(1);
-                setFormControl({ ...formControl, 'title': title, 'sex': btnSex , 'status': statusState  });
+                setFormControl({ ...formControl, 'title': title, 'sex': btnSex , 'status': statusState, "promoted": promotedState });
             }
         } else {
             invalids.title = "Please enter a Title";
@@ -166,7 +168,7 @@ function CreateProduct() {
             setIsReady(false);
             const body = JSON.stringify({ ...formControl });
             console.log(body);
-            axios.post("http://127.0.0.1:8000/api/product", body, config).then( e => {
+            axios.post(process.env.REACT_APP_API_LINK + "/api/product", body, config).then( e => {
                 toast.success('Product correctly added!', { position: "top-center"});
                 setRedirection(true);
             }).catch( err => {
@@ -179,7 +181,7 @@ function CreateProduct() {
         <div className='container'>
             <ToastContainer />
             <h1 className="text-center">Create your Product !</h1>
-            <button onClick={() => window.location.href='/admin'} className='float-right btn btn-warning mb-3'> Back to Dashboard </button>
+            <button onClick={() => window.location.href='/admin?tab=1'} className='float-right btn btn-warning mb-3'> Back to Dashboard </button>
             <form id="formItem">
                 <div className="form-group">
                     <label htmlFor="title">Title</label>
@@ -236,6 +238,10 @@ function CreateProduct() {
                 <div className="form-group">
                     <label htmlFor="status">Active</label>
                     <input type="checkbox" className="ml-2" id="status" onChange={() => setStatusState(!statusState)} checked={statusState}/>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="promoted">Promoted</label>
+                    <input type="checkbox" className="ml-2" id="promoted" onChange={() => setPromotedState(!promotedState)} checked={promotedState}/>
                 </div>
                 <div className="row divBtnSex">
                     <input type="button" className={`btn btn-ligt mr-5 ${btnSex == "F" ? "css-man" : ''}` + (isInvalid.sex ? ' is-invalid' : '')} id="Women" value="Women" onClick={() => setBtnSex("F")}/>

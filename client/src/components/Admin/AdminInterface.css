@@ -23,6 +23,33 @@
 
 .viewsub {white-space: nowrap;}
 
+.tabtitles {
+    width: 192px;
+}
+
+.react-tabs__tab--selected {
+    border-radius: 0!important; border: none!important;
+            background-color: #eeeeee!important;
+
+    color:  #44a1ad!important;
+
+    /* border: hsl(210, 10%, 23%) */
+}
+
+.getpdf {
+    text-decoration: underline;
+    /* color: rgb(0, 0, 170); */
+}
+
+.getpdf:hover {
+    cursor: pointer;
+    color: rgb(0, 0, 255);
+}
+
+.down {
+    top: 3px;
+}
+
 @media (max-width: 768px) {
     .tabtitles {
         font-size: 1em!important;
@@ -41,6 +68,11 @@
     }
 }
 
+.adminTable {
+    min-height: 100%!important;
+        background-color: #eeeeee!important;
+    
+}
 .ProductRow {
     width: 100%;
 }
@@ -118,4 +150,71 @@
 
 .modal-title {
     display: contents;
+}
+
+
+
+/*==========================================*/
+
+.minheight {
+min-height: 100%!important;
+}
+
+.tabsHolder {
+    display: flex;
+    flex-direction: column;
+    color: #eeeeee;
+    /* min-height: 100%!important; */
+    height: auto;
+    background-color: #3e3e3e;
+    border: none!important;
+}
+
+.react-tabs__tab
+{
+bottom: 0!important;
+}
+
+.minheight {
+    min-height: 100%!important;
+}
+.map {
+    width: 98%!important;
+    margin: 20px;
+}
+
+.map svg g:hover{
+
+    fill: #36838d;
+}
+.map span{
+    position: absolute;
+    color: white;
+    font-size: 18px;
+    /* text-shadow: 0px 0px 5px rgba(0, 0, 0,1); */
+    font-weight: bold;
+}
+
+.adminfix {
+    position: relative!important; top: -10px!important; }
+
+.svg-container {
+display: inline-block;
+position: relative;
+width: 100%;
+padding-bottom: 100%;
+vertical-align: middle;
+overflow: hidden;
+}
+
+.bordercustom {
+    border-left: 4px solid;
+}
+
+.getdatabase {
+    background-color: #44a1ad!important;
+}
+
+.getpdf:hover {
+    color: #22626b;
 }

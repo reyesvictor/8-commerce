@@ -12,6 +12,10 @@ import axios from "axios";
 import Results from "./Results";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {TransitionGroup, CSSTransition, SwitchTransition} from 'react-transition-group';
+import Footer from '../footer/Footer';
+import { Controls } from "react-gsap";
+
 
 export default class SearchSidebar extends Component {
   constructor() {
@@ -39,8 +43,10 @@ export default class SearchSidebar extends Component {
 
       colors: null,
       isColorsReady: false,
+      limitColors: 4,
 
       showFilter: false,
+      displayMethod: "square",
 
       isResultsReady: false,
 
@@ -50,6 +56,8 @@ export default class SearchSidebar extends Component {
 
       justArrived: true,
     };
+
+    this.baseState = this.state;
 
     this.handleName = this.handleName.bind(this);
     this.sliderChangeValue = this.sliderChangeValue.bind(this);
@@ -68,7 +76,24 @@ export default class SearchSidebar extends Component {
     this.defaultValueSexe = this.defaultValueSexe.bind(this);
     this.defaultValueName = this.defaultValueName.bind(this);
     this.handleSubmitEnter = this.handleSubmitEnter.bind(this);
+    this.handleDisplayMethod = this.handleDisplayMethod.bind(this);
+    this.handleMoreColors = this.handleMoreColors.bind(this);
   }
+
+  // static propTypes = {
+  //   location: React.PropTypes.object.isRequired
+  // }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.location !== prevProps.location) {
+      this.onRouteChanged();
+    }
+  }
+  
+  onRouteChanged() {
+    this.loadSearchData();
+  }
+
 
   handleSubmitEnter(e) {
     if (e.keyCode === 13) {
@@ -84,17 +109,17 @@ export default class SearchSidebar extends Component {
     // this.handleSubmit();
   }
 
-  sliderChangeValue(e) {
-    this.setState({ sliderCurrentValue: e.target.value, isResultsReady: false });
+  async sliderChangeValue(e) {
+    await this.setState({ sliderCurrentValue: e.target.value, isResultsReady: false });
     this.handleSubmit();
   }
 
-  handleSexe(e) {
-    this.setState({ sexe: e.target.value, isResultsReady: false });
+  async handleSexe(e) {
+    await this.setState({ sexe: e.target.value, isResultsReady: false });
     this.handleSubmit();
   }
 
-  handleSize(e) {
+  async handleSize(e) {
     let sizes = this.state.size;
     let checkSize = sizes.indexOf(e.target.value);
     let newSizes = [...sizes];
@@ -110,11 +135,11 @@ export default class SearchSidebar extends Component {
       }
     }
 
-    this.setState({ size: newSizes });
+    await this.setState({ size: newSizes });
     this.handleSubmit();
   }
 
-  handleColor(e) {
+  async handleColor(e) {
     let colors = this.state.color;
     let checkColor = colors.indexOf(e.target.value);
     let newColors = [...colors];
@@ -130,7 +155,7 @@ export default class SearchSidebar extends Component {
       }
     }
 
-    this.setState({ color: newColors });
+    await this.setState({ color: newColors });
     this.handleSubmit();
   }
 
@@ -149,7 +174,7 @@ export default class SearchSidebar extends Component {
     this.setState({ category: e.target.value });
 
     await axios
-      .get("http://localhost:8000/api/category/")
+      .get(process.env.REACT_APP_API_LINK + "/api/category/")
       .then(async (res) => {
         console.log(res.data.data);
         await this.setState({ categories: res.data.data, subcategory: null, isCategoryReady: true });
@@ -174,6 +199,17 @@ export default class SearchSidebar extends Component {
   async handleSortBy(e) {
     await this.setState({ sortBy: e.target.value });
     this.handleSubmit()
+  }
+
+  handleMoreColors() {
+    if (this.state.limitColors == 4){
+      this.setState({limitColors: 10000})
+      $('#link-more-colors').text('- Hide Colors')
+    }
+    else {
+      this.setState({limitColors: 4})
+      $('#link-more-colors').text('+ More Colors')
+    }
   }
 
   checkEmptyArray(array) {
@@ -209,17 +245,22 @@ export default class SearchSidebar extends Component {
     if (e) {
       e.preventDefault();
     }
+    
     console.log(jsonRequest);
+
+    this.setState({ isResultsReady: false });
 
     const header = { "Content-Type": "application/json" };
 
     axios
       .post(
-        "http://localhost:8000/api/product/filter?offset=0&limit=10",
+        process.env.REACT_APP_API_LINK + "/api/product/filter?offset=0&limit=10",
         jsonRequest,
         { headers: header }
       )
       .then((res) => {
+        console.log(res.data)
+        
         this.setState({results: res.data, isResultsReady: true});
         // if (this.state.showFilter == true){
         //   this.showFilter()
@@ -234,14 +275,24 @@ export default class SearchSidebar extends Component {
     this.setState({ showFilter: !this.state.showFilter, justArrived: false });
   }
 
-  componentDidMount() {
-    let paramsURL = this.props.location.search.substr(1).split("=")
+  async handleDisplayMethod(e) {
+    await this.setState({ displayMethod: e.target.value, isResultsReady: false });
+    this.handleSubmit();
+  }
 
+  componentDidMount() {
+    this.loadSearchData();
+  }
+
+  loadSearchData = () => {
+    this.setState(this.baseState);
+    let paramsURL = this.props.location.search.substr(1).split("=")
+  
     if (paramsURL[0] == "sexe") {
       this.defaultValueSexe(paramsURL[1])
 
       axios
-        .get("http://localhost:8000/api/subcategory/")
+        .get(process.env.REACT_APP_API_LINK + "/api/subcategory/")
         .then((res) => {
           console.log(res.data);
           this.setState({ subcategories: res.data, isSubCategoryReady: true });
@@ -251,7 +302,7 @@ export default class SearchSidebar extends Component {
         });
   
       axios
-        .get("http://localhost:8000/api/category/")
+        .get(process.env.REACT_APP_API_LINK + "/api/category/")
         .then((res) => {
           console.log(res.data.data);
           this.setState({ categories: res.data.data, isCategoryReady: true });
@@ -265,7 +316,7 @@ export default class SearchSidebar extends Component {
       this.defaultValueName(paramsURL[1])
 
       axios
-        .get("http://localhost:8000/api/subcategory/")
+        .get(process.env.REACT_APP_API_LINK + "/api/subcategory/")
         .then((res) => {
           console.log(res.data);
           this.setState({ subcategories: res.data, isSubCategoryReady: true });
@@ -275,7 +326,7 @@ export default class SearchSidebar extends Component {
         });
   
       axios
-        .get("http://localhost:8000/api/category/")
+        .get(process.env.REACT_APP_API_LINK + "/api/category/")
         .then((res) => {
           console.log(res.data.data);
           this.setState({ categories: res.data.data, isCategoryReady: true });
@@ -295,7 +346,7 @@ export default class SearchSidebar extends Component {
       this.defaultValueCategory(paramsURL[1])
       
       axios
-      .get("http://localhost:8000/api/category/")
+      .get(process.env.REACT_APP_API_LINK + "/api/category/")
       .then(async (res) => {
         console.log(res.data.data);
         await this.setState({ categories: res.data.data, isCategoryReady: true });
@@ -312,7 +363,7 @@ export default class SearchSidebar extends Component {
     }
     else {
       axios
-        .get("http://localhost:8000/api/subcategory/")
+        .get(process.env.REACT_APP_API_LINK + "/api/subcategory/")
         .then((res) => {
           console.log(res.data);
           this.setState({ subcategories: res.data, isSubCategoryReady: true });
@@ -322,7 +373,7 @@ export default class SearchSidebar extends Component {
         });
   
       axios
-        .get("http://localhost:8000/api/category/")
+        .get(process.env.REACT_APP_API_LINK + "/api/category/")
         .then((res) => {
           console.log(res.data.data);
           this.setState({ categories: res.data.data, isCategoryReady: true });
@@ -336,7 +387,7 @@ export default class SearchSidebar extends Component {
 
 
     axios
-      .get("http://localhost:8000/api/color/")
+      .get(process.env.REACT_APP_API_LINK + "/api/color/")
       .then((res) => {
         console.log(res.data);
         this.setState({ colors: res.data, isColorsReady: true });
@@ -352,7 +403,7 @@ export default class SearchSidebar extends Component {
     this.setState({ subcategory: value });
 
     await axios
-      .get("http://localhost:8000/api/subcategory/")
+      .get(process.env.REACT_APP_API_LINK + "/api/subcategory/")
       .then( (res) => {
         console.log(res.data);
 
@@ -372,7 +423,7 @@ export default class SearchSidebar extends Component {
       });
 
     axios
-      .get("http://localhost:8000/api/category/")
+      .get(process.env.REACT_APP_API_LINK + "/api/category/")
       .then(async (res) => {
         console.log(res.data.data);
         await this.setState({ categories: res.data.data, isCategoryReady: true });
@@ -411,16 +462,18 @@ export default class SearchSidebar extends Component {
 
     const sortChecked = this.state.sortBy;
     const results = this.state.results;
+    const displayMethod = this.state.displayMethod;
 
     const justArrived = this.state.justArrived;
 
     return (
       <>
+        {/* FILTERS */}
         <div
           className={this.state.showFilter ? "to-right" : justArrived ? "d-none" : "to-left" }
           id="filter-div"
         >
-          <i class="material-icons md-18 float-right" onClick={this.showFilter} id="btn-close-filter">close</i>
+          <i className="material-icons md-18 float-right" onClick={this.showFilter} id="btn-close-filter">close</i>
           {/* Price */}
           <div className="form-group d-block mt-3">
             <label htmlFor="formControlRange" className="filter-label">Price</label>
@@ -559,7 +612,8 @@ export default class SearchSidebar extends Component {
             <span className="filter-label">Color</span><br/>
 
             {isColorReady
-                ? this.state.colors.map((color) => (
+                ? this.state.colors.slice(0, this.state.limitColors).map(color => (
+                  <>
                   <div className="form-check form-check-inline f-border" key={color.id}>
                     <input
                       className="form-check-input"
@@ -571,10 +625,11 @@ export default class SearchSidebar extends Component {
                     <label className="form-check-label" htmlFor={color.id}>
                       {color.name}
                     </label>
-                  </div>
+                  </div><br/></>
                   ))
                 : null
             }
+            <a href="#" id="link-more-colors" className="f-border md-force-align" onClick={this.handleMoreColors}>+ More colors</a>
           </div>
 
           {/* Category */}
@@ -616,7 +671,7 @@ export default class SearchSidebar extends Component {
 
               <option value={null}></option>
 
-              {isSubCategoriesReady
+              {isSubCategoriesReady && this.state.subcategories
                 ? 
                 this.state.subcategories.map((subcategory) => (
                   <option key={subcategory.id} value={subcategory.name} >
@@ -646,8 +701,8 @@ export default class SearchSidebar extends Component {
 
             
             {/* SEARCH BAR */}
-            <div className="row justify-content-center d-inline">
-              <i class="material-icons md-24">search</i>
+            <div className="row justify-content-center d-inline md-force-align">
+              <i className="material-icons md-24">search</i>
               <input
                 type="search"
                 placeholder="Search product..."
@@ -667,13 +722,16 @@ export default class SearchSidebar extends Component {
             <div className="row mt-2 p-3">
                 <div className="mr-auto">
                   <span
-                  className="small text-secondary"
+                  className="small text-secondary md-force-align"
                   id="filter-link"
                   onClick={this.showFilter}
                   aria-controls="filter-div"
                   aria-expanded={this.state.showFilter}
                   >
-                  <span className="pb-1"><i class="material-icons md-18 pr-1">filter_alt</i>{this.state.showFilter ? "Hide Filters" : "Show Filters"}</span>
+                    {this.state.showFilter 
+                    ? <span className="pb-1"><i className="material-icons md-18 pr-1">chevron_left</i> Hide Filters</span> 
+                    : <span className="pb-1"><i className="material-icons md-18 pr-1">filter_alt</i> Show Filters</span> }
+                  
                   </span>
                 </div>
 
@@ -697,7 +755,7 @@ export default class SearchSidebar extends Component {
                       <ToggleButton
                         type="radio"
                         variant="secondary"
-                        name="radio" float-left mr-auto
+                        name="radio"
                         value="desc"
                         checked={sortChecked == "desc"}
                         onChange={this.handleSortBy}
@@ -723,14 +781,52 @@ export default class SearchSidebar extends Component {
                       <Dropdown.Item onClick={this.handleOrderBy}>Name</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
+
+                  <ButtonGroup 
+                    className="btn-sm md-force-align"
+                    toggle
+                    >
+                      <ToggleButton
+                        type="radio"
+                        variant="light"
+                        name="radio"
+                        value="square"
+                        checked={displayMethod == "square"}
+                        onChange={this.handleDisplayMethod}
+                        className="btn-sm"
+                      >
+                        <i className="material-icons md-18 icon-filter">view_module</i>
+                      </ToggleButton>
+                      <ToggleButton
+                        type="radio"
+                        variant="light"
+                        name="radio"
+                        value="line"
+                        checked={displayMethod == "line"}
+                        onChange={this.handleDisplayMethod}
+                        className="btn-sm"
+                      >
+                        <i className="material-icons md-18 icon-filter">view_list</i>
+                      </ToggleButton>
+                    </ButtonGroup>
                 </div>
             </div>
 
-          {this.state.isResultsReady 
-            ? <Results results={results} />
-            : null}
+            <CSSTransition
+              in={this.state.isResultsReady}
+              timeout={600}
+              classNames="results"
+              unmountOnExit
+              appear
+            >
+              <Results results={results} display={displayMethod}/>
+            </CSSTransition>
+        </div>
+        <div className="col-sm-12 mt-5">
+          <Footer />
         </div>
       </>
     );
   }
+
 }

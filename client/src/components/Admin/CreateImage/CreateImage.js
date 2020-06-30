@@ -14,14 +14,15 @@ const CreateImage = () => {
     const config = {
         headers: {
             "Content-Type": "multipart/form-data",
+            "Authorization": 'Bearer '+token
         }
     }
 
-    useEffect(() => {
-        if (token) {
-            config.headers['x-auth-token'] = token
-        }
-    }, [token]);
+    // useEffect(() => {
+    //     if (token) {
+    //         config.headers['x-auth-token'] = token
+    //     }
+    // }, [token]);
 
     const onFileChange = (e) => {
         let files = e.target.files || e.dataTransfer.files;
@@ -43,7 +44,7 @@ const CreateImage = () => {
         bodyFormData.append('image',picture[0]);
         bodyFormData.append('color', 'default');
         axios
-        .post('http://localhost:8000/api/product/'+idproduct+'/image', bodyFormData, config)
+        .post(process.env.REACT_APP_API_LINK + '/api/product/'+idproduct+'/image', bodyFormData, config)
         .then(response => {
           setPicture([]);
           console.log(response);

@@ -16,8 +16,8 @@ import { returnErrors } from './errorActions'
 export const loadUser = () => (dispatch, getState) => {
     // loading user
     dispatch({ type: USER_LOADING })
-
-    axios.get('http://127.0.0.1:8000/checktoken', tokenConfig(getState))
+    let params = (localStorage.getItem('method_login') && localStorage.getItem('method_login') == 'google') ? "?method_login=google" : "";
+    axios.get(process.env.REACT_APP_API_LINK + '/api/checktoken' + params, tokenConfig(getState))
         .then(res => dispatch({
             type: USER_LOADED,
             // res.data is an object with user object and the token
@@ -28,6 +28,24 @@ export const loadUser = () => (dispatch, getState) => {
                 type: AUTH_ERROR
             })
         })
+}
+
+
+export const responseGoogle = (response) => (dispatch, getState) => {
+    // loading user
+    dispatch({ type: USER_LOADING })
+    axios.post(process.env.REACT_APP_API_LINK + '/connect/google/check', response).then(resp => {
+        console.log('ok inside post Hao ! Yeaaaah !')
+        localStorage.setItem('method_login', 'google');
+        
+        dispatch({
+            type: LOGIN_SUCCESS,
+            // res.data is an object with user object and the token
+            payload: resp.data
+        })
+    }).catch((error) => {
+        console.log(error)
+    })
 }
 
 // Register User
@@ -41,7 +59,7 @@ export const register = ({ username, email, password }) => dispatch => {
     //request info
     const body = JSON.stringify({ username, email, password })
 
-    axios.post('http://localhost:8000/register', body, config)
+    axios.post(process.env.REACT_APP_API_LINK + '/register', body, config)
         .then(res => dispatch({
             type: REGISTER_SUCCESS,
             payload: res.data
@@ -68,7 +86,7 @@ export const tokenConfig = getState => {
 
     // if token is good, add it to headers
     if (token) {
-        config.headers['x-auth-token'] = token
+        config.headers['Authorization'] = 'Bearer ' + token;
     }
     return config
 }
@@ -92,7 +110,7 @@ export const login = ({ email, password }) => dispatch => {
     //request info
     const body = JSON.stringify({ email, password })
 
-    axios.post('http://localhost:8000/login', body, config)
+    axios.post(process.env.REACT_APP_API_LINK + '/api/login_check', body, config)
         .then(res => {
             dispatch({
                 type: LOGIN_SUCCESS,

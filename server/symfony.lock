@@ -129,8 +129,29 @@
     "gedmo/doctrine-extensions": {
         "version": "v2.4.41"
     },
+    "guzzlehttp/guzzle": {
+        "version": "6.5.5"
+    },
+    "guzzlehttp/promises": {
+        "version": "v1.3.1"
+    },
+    "guzzlehttp/psr7": {
+        "version": "1.6.1"
+    },
     "kelunik/certificate": {
         "version": "v1.1.2"
+    },
+    "knpuniversity/oauth2-client-bundle": {
+        "version": "1.20",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "1.20",
+            "ref": "80acc9223a205cbf5d9828fd616c82a374d281dd"
+        },
+        "files": [
+            "config/packages/knpu_oauth2_client.yaml"
+        ]
     },
     "laminas/laminas-code": {
         "version": "3.4.1"
@@ -141,6 +162,15 @@
     "laminas/laminas-zendframework-bridge": {
         "version": "1.0.4"
     },
+    "lcobucci/jwt": {
+        "version": "3.3.2"
+    },
+    "league/oauth2-client": {
+        "version": "2.4.1"
+    },
+    "league/oauth2-google": {
+        "version": "3.0.2"
+    },
     "league/uri": {
         "version": "6.2.1"
     },
@@ -150,8 +180,35 @@
     "league/uri-parser": {
         "version": "1.4.1"
     },
+    "lexik/jwt-authentication-bundle": {
+        "version": "2.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "2.5",
+            "ref": "5b2157bcd5778166a5696e42f552ad36529a07a6"
+        },
+        "files": [
+            "config/packages/lexik_jwt_authentication.yaml"
+        ]
+    },
+    "maennchen/zipstream-php": {
+        "version": "2.1.0"
+    },
+    "markbaker/complex": {
+        "version": "1.4.8"
+    },
+    "markbaker/matrix": {
+        "version": "1.2.0"
+    },
     "monolog/monolog": {
         "version": "2.1.0"
+    },
+    "myclabs/php-enum": {
+        "version": "1.7.6"
+    },
+    "namshi/jose": {
+        "version": "7.2.3"
     },
     "nelmio/cors-bundle": {
         "version": "1.5",
@@ -186,6 +243,9 @@
     "phpdocumentor/type-resolver": {
         "version": "1.1.0"
     },
+    "phpoffice/phpspreadsheet": {
+        "version": "1.13.0"
+    },
     "psr/cache": {
         "version": "1.0.1"
     },
@@ -203,6 +263,12 @@
     },
     "psr/log": {
         "version": "1.1.3"
+    },
+    "psr/simple-cache": {
+        "version": "1.0.1"
+    },
+    "ralouphie/getallheaders": {
+        "version": "3.0.3"
     },
     "rbdwllr/reallysimplejwt": {
         "version": "3.0.3"
@@ -504,6 +570,15 @@
     "symfony/security-http": {
         "version": "v5.1.0"
     },
+    "symfony/sendgrid-mailer": {
+        "version": "4.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "4.4",
+            "ref": "b46e4f8f1adb2864f0aa9c0ff57aea3324a07199"
+        }
+    },
     "symfony/serializer": {
         "version": "v5.1.0"
     },
@@ -602,6 +677,9 @@
     },
     "twig/twig": {
         "version": "v3.0.3"
+    },
+    "webimpress/safe-writer": {
+        "version": "2.0.1"
     },
     "webmozart/assert": {
         "version": "1.8.0"

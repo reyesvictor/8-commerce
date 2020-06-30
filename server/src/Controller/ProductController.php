@@ -26,6 +26,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ProductController extends AbstractController
 {
@@ -34,8 +36,13 @@ class ProductController extends AbstractController
      */
     public function index(Request $request, ProductRepository $productRepository, NormalizerInterface $normalizer)
     {
+        $products = $productRepository->findBy(
+            $request->query->get('promoted') ? ['promoted' => 1] : [],
+            $request->query->get('clicks') ? ['clicks' => 'DESC'] : [],
+            $request->query->get('limit'),
+            $request->query->get('offset')
+        );
         $count = $productRepository->countResults();
-        $products = $productRepository->findBy([], array('clicks' => 'DESC'), $request->query->get('limit'), $request->query->get('offset'));
         $products = $normalizer->normalize($products, null, ['groups' => 'products']);
         $products = array_map(function ($v) {
             $path = "./images/" . $v['id'] . "/default";
@@ -45,6 +52,21 @@ class ProductController extends AbstractController
             $imgArray = array_map(function ($img) use ($v) {
                 return "/api/image/" . $v['id'] . "/default/$img";
             }, $imgArray);
+
+            $i = 0;
+            foreach ($v["subproducts"] as $subproduct) {
+                $price = $subproduct["promo"] ? $subproduct["price"] - ($subproduct["price"] * ($subproduct["promo"] / 100)) : $subproduct["price"];
+                if ($i == 0) {
+                    $v["basePrice"] = $subproduct["price"];
+                    $v["price"] = $price;
+                    $v["promo"] = $subproduct["promo"];
+                    $i++;
+                } else if ($price < $v["price"]) {
+                    $v["basePrice"] = $subproduct["price"];
+                    $v["price"] = $price;
+                    $v["promo"] = $subproduct["promo"];
+                }
+            }
             return array_merge($v, ["images" => array_values($imgArray)]);
         }, $products);
 
@@ -52,15 +74,25 @@ class ProductController extends AbstractController
     }
 
     /**
+     * @Route("/api/product/count", name="product_count", methods="GET")
+     */
+    public function productCount(Request $request, ProductRepository $productRepository)
+    {
+        $count = $productRepository->countResults();
+        return $this->json(['total_products_count'], 200);
+    }
+    /**
      * @Route("/api/product", name="product_create", methods="POST")
      */
     public function productCreate(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, ValidatorInterface $validator, SupplierRepository $supplierRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         try {
             $jsonContent = $request->getContent();
             $req = json_decode($jsonContent);
             $product = $serializer->deserialize($jsonContent, Product::class, 'json', [
-                AbstractNormalizer::IGNORED_ATTRIBUTES => ['subcategory', 'subproducts'],
+                AbstractNormalizer::IGNORED_ATTRIBUTES => ['subcategory', 'subproducts', 'promoted'],
                 ObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true
             ]);
             if (!isset($req->subcategory)) return $this->json(['message' => 'subcategory missing'], 400, []);
@@ -73,6 +105,9 @@ class ProductController extends AbstractController
             $supplier = $supplierRepository->findOneBy(['id' => $req->supplier]);
             if (!isset($supplier)) return $this->json(['message' => 'supplier not found'], 400, []);
 
+            if (!isset($req->promoted)) return $this->json(['message' => 'Promoted is missing'], 400, []);
+
+            $product->setPromoted($req->promoted);
             $product->setSupplier($supplier);
             $product->setSubCategory($subCategory);
             $product->setCreatedAt(new DateTime());
@@ -137,6 +172,8 @@ class ProductController extends AbstractController
      */
     public function productUpdate(Request $request, EntityManagerInterface $em, ValidatorInterface $validator, SerializerInterface $serializer, ProductRepository $productRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         try {
             $jsonContent = $request->getContent();
             $req = json_decode($jsonContent);
@@ -144,7 +181,7 @@ class ProductController extends AbstractController
             if ($product) {
                 try {
                     $product = $serializer->deserialize($jsonContent, Product::class, 'json', [
-                        AbstractNormalizer::IGNORED_ATTRIBUTES => ['subcategory', 'subproducts', 'promo'],
+                        AbstractNormalizer::IGNORED_ATTRIBUTES => ['subcategory', 'subproducts', 'promo', 'promoted'],
                         AbstractNormalizer::OBJECT_TO_POPULATE => $product
                     ]);
                 } catch (NotNormalizableValueException $e) {
@@ -152,7 +189,7 @@ class ProductController extends AbstractController
                 }
                 if (isset($req->subcategory)) {
                     $subcategory = $this->getDoctrine()->getRepository(SubCategory::class)->find($req->subcategory);
-                    if(!isset($subcategory)) return $this->json(['message' => 'subcategory not found'], 400, []);
+                    if (!isset($subcategory)) return $this->json(['message' => 'subcategory not found'], 400, []);
                     $product->setSubCategory($subcategory);
                 }
                 if (isset($req->promo)) {
@@ -160,9 +197,13 @@ class ProductController extends AbstractController
                     $product->setPromo($promoNb);
                 }
 
-                if(isset($req->supplier_id)) {
+                if (isset($req->promoted)) {
+                    $product->setPromoted($req->promoted);
+                }
+
+                if (isset($req->supplier_id)) {
                     $supplier = $this->getDoctrine()->getRepository(Supplier::class)->find($req->supplier_id);
-                    if(!isset($supplier)) return $this->json(['message' => 'supplier not found'], 400, []);
+                    if (!isset($supplier)) return $this->json(['message' => 'supplier not found'], 400, []);
                     $product->setSupplier($supplier);
                 }
 
@@ -186,6 +227,8 @@ class ProductController extends AbstractController
      */
     public function productRemove(Request $request, ProductRepository $productRepository, EntityManagerInterface $em)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $product = $productRepository->findOneBy(['id' => $request->attributes->get('id')]);
 
         if ($product) {
@@ -222,6 +265,11 @@ class ProductController extends AbstractController
             $imgArray = array_map(function ($img) use ($v) {
                 return "/api/image/" . $v['product_id'] . "/default/$img";
             }, $imgArray);
+
+            $price = $v["promo"] ? $v["price"] - ($v["price"] * ($v["promo"] / 100)) : $v["price"];
+            $v["basePrice"] = $v["price"];
+            $v["price"] = $price;
+
             return array_merge($v, ["images" => array_values($imgArray)]);
         }, $products);
 
@@ -250,8 +298,14 @@ class ProductController extends AbstractController
             $imgArray = array_map(function ($img) use ($v) {
                 return "/api/image/" . $v['product_id'] . "/default/$img";
             }, $imgArray);
+
+            $price = $v["promo"] ? $v["price"] - ($v["price"] * ($v["promo"] / 100)) : $v["price"];
+            $v["basePrice"] = $v["price"];
+            $v["price"] = $price;
+
             return array_merge($v, ["images" => array_values($imgArray)]);
         }, $products);
+
         return $this->json($products, 200);
     }
 
@@ -280,6 +334,7 @@ class ProductController extends AbstractController
      */
     public function addImage(Request $request)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         $productId = $request->attributes->get('id');
         $uploadedFile = $request->files->get('image');
@@ -309,5 +364,17 @@ class ProductController extends AbstractController
                 'message' => 'Not found'
             ], 404);
         }
+    }
+
+    /**
+     * @Route("/api/product/promoted", name="product_promoted", methods="GET")
+     */
+    public function promotedProduct(ProductRepository $productRepository)
+    {
+        $products = $productRepository->findBy(['promoted' => 1]);
+        if (!$products) {
+            return $this->json(['message' => 'No product in promotion'], 404);
+        }
+        return $this->json($products, 200, [], ['groups' => 'products']);
     }
 }

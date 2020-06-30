@@ -24,31 +24,39 @@ const SubProductInterface = () => {
     const [colorId, setColorId] = useState('default');
     const [colors, setColors] = useState([]);
 
-    const [limit, setLimit] = useState(2);
+    const [limit, setLimit] = useState(5);
     const [offset, setOffset] = useState(0);
     const [pageCount, setPageCount] = useState();
     const [postData, setPostData] = useState();
     const [getSubProducts, setGetSubProducts] = useState([]);
     const [subProducts, setSubProducts] = useState([]);
+    const [deleteSubProductModal, setDeleteSubProductModal] = useState(false);
     const [titleProduct, setTitleProduct] = useState('');
+    const [subProductId, setSubProductId] = useState(0);
     let id = useRouteMatch("/admin/subproduct/:id").params.id;
     const token = store.getState().auth.token
     const config = {
         headers: {
-            "Content-type": "application/json"
+            "Content-type": "application/json",
+            "Authorization": 'Bearer '+token
         }
     }
-    useEffect(() => {
-        if (token) {
-            config.headers['x-auth-token'] = token
-        }
-    }, [token]);
-
     // useEffect(() => {
-    //     receivedData()
-    // }, [offset, subProducts])
+    //     if (token) {
+    //         config.headers['Authorization'] = 'Bearer '+token;
+    //     }
+    // }, [token]);
+
     useEffect(() => {
-        axios.get("http://localhost:8000/api/product/" + id, config)
+        receivedData();
+    }, [offset])
+
+    useEffect(() => {
+        setOffset(0);
+    }, [pageCount]);
+
+    const receivedData = () => {
+        axios.get(process.env.REACT_APP_API_LINK + "/api/product/" + id, config)
             .then(async res => {
 
                 console.log(res.data);
@@ -74,18 +82,11 @@ const SubProductInterface = () => {
                 console.log(error);
                 toast.error('Error !', { position: 'top-center' });
             });
-    }, [offset])
-
-    const deleteProduct = (idSub) => {
-        axios.delete("http://localhost:8000/api/subproduct/" + idSub, config)
+    }
+    const deleteSubProduct = (idSub) => {
+        axios.delete(process.env.REACT_APP_API_LINK + "/api/subproduct/" + idSub, config)
             .then(res => {
-                axios.get("http://localhost:8000/api/product/" + id, config)
-                    .then(res => {
-                        setSubProducts(res.data.subproducts);
-                    })
-                    .catch(error => {
-                        toast.error('Error !', { position: 'top-center' });
-                    });
+                receivedData();
                 toast.success(res.data.message, { position: "top-center" });
             })
             .catch(error => {
@@ -108,7 +109,7 @@ const SubProductInterface = () => {
     // });
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/api/color", config).then(allColors => {
+        axios.get(process.env.REACT_APP_API_LINK + "/api/color", config).then(allColors => {
             let optionColors = [];
             allColors.data.map(colorMap => {
                 optionColors.push(<option key={colorMap.id} value={colorMap.id}>{colorMap.name}</option>)
@@ -146,7 +147,7 @@ const SubProductInterface = () => {
         bodyFormData.append('image', picture[0]);
         bodyFormData.append('color', colorId);
 
-        axios.post('http://localhost:8000/api/image/' + idProduct, bodyFormData, config)
+        axios.post(process.env.REACT_APP_API_LINK + '/api/image/' + idProduct, bodyFormData, config)
             .then(response => {
                 setPicture([]);
                 setShow(false)
@@ -164,14 +165,14 @@ const SubProductInterface = () => {
             </h1>
             <div className="row justify-content-end mb-2">
                 <h3 className="mr-auto ml-2">All Subproducts of <b>{titleProduct}</b></h3>
-                <button onClick={() => window.location.href = '/admin'} className='float-right btn m-2 btn-warning'> Back to Dashboard </button>
+                <button onClick={() => window.location.href = '/admin?tab=1'} className='float-right btn m-2 btn-warning'> Back to Dashboard </button>
             </div>
             <div className="row justify-content-end mb-2">
                 <button onClick={redirectCreate} className="btn btn-success m-2">
                     + New Subproduct for <b>{titleProduct}</b>
                 </button>
             </div>
-            <div className="row border p-2">
+            <div className="row  bg-light border p-2">
                 <table>
                     <thead>
                         {pageCount > 0 &&
@@ -199,22 +200,9 @@ const SubProductInterface = () => {
                                     <button onClick={e => e.preventDefault() + handleShow(id, subproduct.id)} className="btn btn-outline-success m-2">Add Image</button>
                                 </td>
                                 <td> <button onClick={() => window.location.href = '/admin/subproduct/' + id + '/' + subproduct.id + '/update'} className="btn btn-outline-info m-2">Modify</button></td>
-                                <td> <button onClick={() => deleteProduct(subproduct.id)} className="btn btn-outline-danger m-2">Delete</button></td>
+                                <td> <button onClick={() => { setSubProductId(subproduct.id); setDeleteSubProductModal(true) }} className="btn btn-outline-danger m-2">Delete</button></td>
                             </tr>
                         ) : null}
-                        {/* {subProducts.length > 0 ? subProducts.map((subproduct) => 
-                    <tr key={subproduct.id}>
-                        {console.log(subproduct.map((e) => e.price))}
-                        <td><p className="m-2 align-items-center">{subproduct.id}</p></td>
-                        <td><p className="m-2">{subproduct.price} €</p></td>
-                        <td><p className="m-2">{subproduct.color}</p></td>
-                        <td><p className="m-2">{subproduct.size}</p></td>
-                        <td><p className="m-2">{subproduct.weight}</p></td>
-                        <td> <button onClick={() => window.location.href='/admin/subproduct/'+id+'/'+subproduct.id+'/update'}className="btn btn-outline-info m-2">Modify</button></td>
-                        <td> <button onClick={() => deleteProduct(subproduct.id)} className="btn btn-outline-danger m-2">Delete</button></td>
-                    </tr>
-                    ) : null} */}
-
                         <Modal show={show} onHide={handleClose}>
                             <Modal.Header closeButton>
                                 Download Image !
@@ -244,6 +232,13 @@ const SubProductInterface = () => {
 
                     </tbody>
                 </table>
+                <Modal show={deleteSubProductModal} onHide={() => setDeleteSubProductModal(false)}>
+                    <Modal.Header closeButton>Are you sure to delete this subproduct? This action can't go back</Modal.Header>
+                    <Modal.Body>
+                        <Button color="warning" className="mt-4" onClick={() => setDeleteSubProductModal(false)} block>No, go back</Button>
+                        <Button color="danger" className="mt-4" onClick={() => { deleteSubProduct(subProductId); setDeleteSubProductModal(false) }} block>Yes, i'm sure about delete this SubProduct</Button>
+                    </Modal.Body>
+                </Modal>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <div>

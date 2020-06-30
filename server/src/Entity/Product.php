@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Product
 {
     /**
-     * @Groups({"products","category","subproduct", "supplier_order_details", "supplier_products"})
+     * @Groups({"products","category","subproduct", "supplier_order_details", "supplier_products", "user_order_details"})
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -25,7 +25,7 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"products","category", "subproduct", "supplier_order_details", "supplier_products"})
+     * @Groups({"products","category", "subproduct", "supplier_order_details", "supplier_products", "user_order_details"})
      */
     private $title;
 
@@ -61,7 +61,7 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"products","category", "supplier_products"})
+     * @Groups({"products","category", "supplier_products", "user_order_details"})
      */
     private $sex;
 
@@ -85,11 +85,23 @@ class Product
      */
     private $supplier;
 
+    /**
+     * @ORM\Column(type="boolean")
+     * @Groups({"products"})
+     */
+    private $promoted;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Review::class, mappedBy="product")
+     */
+    private $reviews;
+
 
 
     public function __construct()
     {
         $this->subproducts = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -243,6 +255,49 @@ class Product
     public function setSupplier(?Supplier $supplier): self
     {
         $this->supplier = $supplier;
+
+        return $this;
+    }
+
+    public function getPromoted(): ?bool
+    {
+        return $this->promoted;
+    }
+
+    public function setPromoted(bool $promoted): self
+    {
+        $this->promoted = $promoted;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Review[]
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(Review $review): self
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews[] = $review;
+            $review->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): self
+    {
+        if ($this->reviews->contains($review)) {
+            $this->reviews->removeElement($review);
+            // set the owning side to null (unless already changed)
+            if ($review->getProduct() === $this) {
+                $review->setProduct(null);
+            }
+        }
 
         return $this;
     }

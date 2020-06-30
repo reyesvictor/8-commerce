@@ -1,0 +1,82 @@
+.formCommand {
+    width: 30%;
+    margin: auto;
+}
+
+.resultCommand {
+    float: right;
+}
+
+.borderBottomC {
+    /* border-bottom: 1px solid lightgray; */
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+}
+
+.intransition {
+    margin-left: 46.5%;
+}
+
+.intransition2 {
+    float: right;
+}
+
+
+.disabledC {
+    color: rgb(202, 202, 202);
+}
+
+.arrivedC {
+    color: green;
+    margin-left: 97%;
+}
+
+.bordertable {
+    border: 1px solid rgb(197, 197, 197);
+}
+
+.tablOrder {
+    width: 100%;
+}
+
+.titleTable {
+    width: 33%;
+    padding-top: 5px;
+    background-color: rgb(248, 248, 248);
+}
+
+.errorfound {
+    color: red;
+    ;
+    font-weight: bold;
+}
+
+.tablebordertest:not(:last-child) {
+    border-bottom: 1px solid #b9b9b9;
+    margin: 10px 0;
+}
+
+.tablebordertest .paddright {
+    padding: 15px 0;
+}
+
+.cost {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 4px;
+}
+
+.print {
+    font-size: 40px !important;
+    color: rgb(197, 197, 197);
+}
+
+.print:hover {
+    cursor: pointer;
+    color: black;
+}
+
+.btnCloseFacture {
+    float: right;
+    width: 100%;
+}

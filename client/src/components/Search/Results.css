@@ -13,3 +13,21 @@
   flex-direction: column;
   flex-wrap: wrap;
 }
+
+.product-row {
+  border-bottom: 1px solid rgb(224, 224, 224);
+  /* border: 1px solid black;
+  background-color: #000!important; */
+}
+
+.color-box {
+  border: 1px solid rgb(224, 224, 224);
+  padding: 5px 10px;
+  margin-right: 10px;
+  font-size: 15px;
+}
+
+.color-box:hover {
+  background-color: rgb(250, 250, 250);
+  cursor: pointer;
+}

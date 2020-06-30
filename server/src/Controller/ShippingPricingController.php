@@ -38,9 +38,9 @@ class ShippingPricingController extends AbstractController
      */
     public function shippingPricingDetails(Request $request, ShippingPricingRepository $shippingPricingRepository)
     {
-        $region = $shippingPricingRepository->findOneBy(['id' => $request->attributes->get('id')]);
-        if ($region) {
-            return $this->json($region, 200, [], ['groups' => 'shipping']);
+        $shippingPricing = $shippingPricingRepository->findOneBy(['id' => $request->attributes->get('id')]);
+        if ($shippingPricing) {
+            return $this->json($shippingPricing, 200, [], ['groups' => 'shipping']);
         } else {
             return $this->json(['message' => 'not found'], 404, []);
         }
@@ -51,6 +51,8 @@ class ShippingPricingController extends AbstractController
      */
     public function shippingMethodCreate(Request $request ,ShippingPricingRepository $shippingPricingRepository,ShippingMethodRepository $shippingMethodRepository,RegionRepository $regionRepository,EntityManagerInterface $em)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $jsonContent = $request->getContent();
         $req = json_decode($jsonContent);
    
@@ -109,6 +111,8 @@ class ShippingPricingController extends AbstractController
      */
     public function shippingPricingRemove(Request $request, ShippingPricingRepository $shippingPricingRepository, EntityManagerInterface $em)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $shippingPricing = $shippingPricingRepository->findOneBy(['id' => $request->attributes->get('id')]);
 
         if ($shippingPricing) {
@@ -117,7 +121,7 @@ class ShippingPricingController extends AbstractController
 
             return $this->json([
                 'message' => 'Shipping pricing removed',
-                'product' => $shippingPricing
+                'shippingPricing' => $shippingPricing
             ], 200, [], ['groups' => 'shipping']);
         } else {
             return $this->json(['message' => 'not found'], 404, []);
@@ -129,6 +133,8 @@ class ShippingPricingController extends AbstractController
      */
     public function shippingPricingUpdate(Request $request, EntityManagerInterface $em, ValidatorInterface $validator, ShippingPricingRepository $shippingPricingRepository,ShippingMethodRepository $shippingMethodRepository,RegionRepository $regionRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         try {
             $jsonContent = $request->getContent();
             $req = json_decode($jsonContent);

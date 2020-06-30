@@ -7,6 +7,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouteMatch } from "react-router-dom";
+import ReactPaginate from 'react-paginate';
 import store from '../../../store';
 import {
     Button, Form, FormGroup, Label, Input, Alert
@@ -22,45 +23,64 @@ const SubCategoryInterface = () => {
     const [oldSubCatName, setOldSubCateName] = useState('');
     const [showNew, setShowNew] = useState(false);
     const [newName, setNewName] = useState([]);
-    const [categoriId, setCategoryId] = useState(null);
+    const [categoryId, setCategoryId] = useState(null);
+    const [deleteSubCategoryModal, setDeleteSubCategoryModal] = useState(false);
+    const [subCategoryId, setSubCategoryId] = useState(0);
+    const [allMigrationSubCategory, setAllMigrationSubCategory] = useState([]);
+    const [subCategoryMigrateSelected, setSubCategoryMigrateSelected] = useState(0);
+    const [limit, setLimit] = useState(5);
+    const [offset, setOffset] = useState(0);
+    const [pageCount, setPageCount] = useState();
+
     let id = useRouteMatch("/admin/subcategory/:id").params.id;
 
     const token = store.getState().auth.token
     const config = {
         headers: {
-            "Content-type": "application/json"
+            "Content-type": "application/json",
+            "Authorization": 'Bearer '+token
         }
     }
+    // useEffect(() => {
+    //     if (token) {
+    //         config.headers['Authorization'] = 'Bearer '+token;
+    //     }
+    // }, [token]);
 
     useEffect(() => {
-        if (token) {
-            config.headers['x-auth-token'] = token
-        }
-    }, [token]);
+        receivedSubCategories();
+    }, [offset]);
 
     useEffect(() => {
-        axios.get("http://localhost:8000/api/category/" + id, config)
-            .then(res => {
-                console.log(res.data)
+        setOffset(0);
+    }, [pageCount]);
+
+    const receivedSubCategories = () => {
+        axios.get(process.env.REACT_APP_API_LINK + "/api/category/" + id, config)
+            .then(async res => {
                 setNameCategory(res.data.name)
-                setSubCategories(res.data.subCategories);
+                if (res.data.subCategories) {
+                    await setPageCount(Math.ceil(res.data.subCategories.length / limit))
+                    let arrSubCategories = [];
+                    let nbr;
+                    for (let i = 0; i !== limit; i++) {
+                        if (res.data.subCategories[offset + i]) arrSubCategories.push(res.data.subCategories[offset + i]);
+                        console.log(arrSubCategories);
+                    }
+                    setSubCategories(arrSubCategories);
+                    // setSubCategories(res.data.subCategories);
+                } else {
+                    setPageCount(0)
+                }
             })
             .catch(error => {
                 toast.error('Error !', { position: 'top-center' });
             });
-    }, [])
-
-    const deleteCategory = (idSub) => {
-        console.log(idSub);
-        axios.delete("http://localhost:8000/api/subcategory/" + idSub, config)
+    }
+    const deleteSubCategory = (idSub) => {
+        axios.delete(process.env.REACT_APP_API_LINK + "/api/subcategory/" + idSub, config)
             .then(res => {
-                axios.get("http://localhost:8000/api/category/" + id, config)
-                    .then(res => {
-                        setSubCategories(res.data.subCategories);
-                    })
-                    .catch(error => {
-                        toast.error('Error !', { position: 'top-center' });
-                    });
+                receivedSubCategories();
                 toast.success(res.data.message, { position: "top-center" });
             })
             .catch(error => {
@@ -83,6 +103,14 @@ const SubCategoryInterface = () => {
         let category = str.charAt(0).toUpperCase() + str.slice(1);
         setName(category.replace(/[\s]{2,}/g, " "))
     }
+
+    const handlePageClick = (e) => {
+
+        const selectedPage = e.selected;
+        const newOffset = selectedPage * limit;
+        setOffset(newOffset)
+    };
+
     function onSubmit(e) {
         e.preventDefault();
         if (name.length === 0) {
@@ -94,19 +122,19 @@ const SubCategoryInterface = () => {
             const body = {
                 "name": name,
             }
-            axios.put("http://localhost:8000/api/subcategory/" + subCatId, body, config ).then( e => {
-                toast.success('Category correctly updated!', { position: "top-center"});
+            axios.put(process.env.REACT_APP_API_LINK + "/api/subcategory/" + subCatId, body, config).then(e => {
+                toast.success('Category correctly updated!', { position: "top-center" });
                 setShow(false);
                 setName([]);
-                axios.get("http://localhost:8000/api/category/" + id, config)
+                axios.get(process.env.REACT_APP_API_LINK + "/api/category/" + id, config)
                     .then(res => {
                         setSubCategories(res.data.subCategories);
                     })
                     .catch(error => {
                         toast.error('Error !', { position: 'top-center' });
                     });
-            }).catch( err => {
-                toast.error('Error !', {position: 'top-center'});
+            }).catch(err => {
+                toast.error('Error !', { position: 'top-center' });
             });
         }
     }
@@ -132,23 +160,55 @@ const SubCategoryInterface = () => {
             const body = {
                 "name": newName,
             }
-            axios.post("http://localhost:8000/api/subcategory/create/" + nameCategory + "/" + newName, body, config ).then( e => {
-                toast.success('Category correctly updated!', { position: "top-center"});
+            axios.post(process.env.REACT_APP_API_LINK + "/api/subcategory/create/" + nameCategory + "/" + newName, body, config).then(e => {
+                toast.success('Category correctly updated!', { position: "top-center" });
                 setShowNew(false);
                 setNewName([]);
-                axios.get("http://localhost:8000/api/category/" + id, config)
+                axios.get(process.env.REACT_APP_API_LINK + "/api/category/" + id, config)
                     .then(res => {
                         setSubCategories(res.data.subCategories);
                     })
                     .catch(error => {
                         toast.error('Error !', { position: 'top-center' });
                     });
-            }).catch( err => {
-                toast.error('Error !', {position: 'top-center'});
+            }).catch(err => {
+                toast.error('Error !', { position: 'top-center' });
             });
         }
     }
 
+
+    const handleSelectMigration = (event) => {
+        setSubCategoryMigrateSelected(event.target.value);
+    }
+    const migrationSubCategory = async (idSubCategory) => {
+        const optionSubCategoryMigration = [];
+        console.log(idSubCategory);
+        await axios.get(process.env.REACT_APP_API_LINK + "/api/subcategory/", config).then(e => {
+            let migration = subCategoryMigrateSelected
+            console.log(e)
+            e.data.map((subcategory) => subcategory.id !== idSubCategory ? optionSubCategoryMigration.push(<option key={subcategory.id} value={subcategory.id}>{subcategory.name}</option>) && migration === 0 ? migration = subcategory.id : null : null)
+            setSubCategoryMigrateSelected(migration)
+        }).catch(err => {
+            toast.error('Error to get category!', { position: 'top-center' });
+        });
+
+        setAllMigrationSubCategory(optionSubCategoryMigration);
+    }
+    const migrateSubCategory = (idTakeMigration, idToMigrate) => {
+        let body = {
+            "newsubcategory": parseInt(idTakeMigration),
+            "oldsubcategory": idToMigrate
+        };
+        console.log(body);
+        axios.put(process.env.REACT_APP_API_LINK + "/api/subcategory/migrate", body, config).then(res => {
+            toast.success(res.message, { position: 'top-center' });
+            deleteSubCategory(idToMigrate);
+        }).catch(err => {
+            console.log(err.message)
+            toast.error(err.message, { position: 'top-center' });
+        });
+    }
     return (
         <div className="container">
             <ToastContainer />
@@ -157,7 +217,7 @@ const SubCategoryInterface = () => {
             </h1>
             <div className="row justify-content-end mb-2">
                 <h3 className="mr-auto ml-2">All SubCategories of <b>{nameCategory}</b></h3>
-                <button onClick={() => window.location.href = '/admin'} className='float-right btn m-2 btn-warning'> Back to Dashboard </button>
+                <button onClick={() => window.location.href = '/admin?tab=2'} className='float-right btn m-2 btn-warning'> Back to Dashboard </button>
             </div>
             <div className="row justify-content-end mb-2">
                 {/* <button onClick={() => window.open('/admin/create/subcategory')} className="btn btn-success m-2">
@@ -185,7 +245,7 @@ const SubCategoryInterface = () => {
                     </Modal.Body>
                 </Modal>
             </div>
-            <div className="row border p-2">
+            <div className="row bg-light  border p-2">
                 <table>
                     <thead>
                         <tr>
@@ -196,12 +256,12 @@ const SubCategoryInterface = () => {
                     <tbody>
                         {subCategories.length > 0 ? subCategories.map((category) =>
                             <tr key={category.id}>
-                                {console.log(category)}
                                 <td><p className="m-2 align-items-center">{category.id}</p></td>
                                 <td><p className="m-2">{category.name} </p></td>
                                 {/* <td> <button onClick={() => window.location.href = '/admin/subcategory/' + id + '/' + category.id + '/update'} className="btn btn-outline-info m-2">Modify</button></td> */}
                                 <td> <button onClick={e => e.preventDefault() + handleShow(id, category.id, category.name)} className="btn btn-outline-info m-2">Modify</button></td>
-                                <td> <button onClick={() => deleteCategory(category.id)} className="btn btn-outline-danger m-2">Delete</button></td>
+                                <td> <button onClick={() => { migrationSubCategory(category.id); setDeleteSubCategoryModal(true); setSubCategoryId(category.id) }} className="btn btn-outline-danger m-2">Delete</button></td>
+                                {/* <td> <button onClick={() => deleteSubCategory(category.id)} className="btn btn-outline-danger m-2">Delete</button></td> */}
                             </tr>
                         ) : null}
                     </tbody>
@@ -224,6 +284,34 @@ const SubCategoryInterface = () => {
                         </Form>
                     </Modal.Body>
                 </Modal>
+                <Modal show={deleteSubCategoryModal} size="lg" onHide={() => setDeleteSubCategoryModal(false)}>
+                    <Modal.Header closeButton>Careful ! Deleting a SubCategory will delete all Products !</Modal.Header>
+                    <Modal.Body>
+                        <h4>I want to keep my Products and migrate them to</h4>
+                        <select className="form-control form-control-lg" onChange={handleSelectMigration}>
+                            {allMigrationSubCategory}
+                        </select>
+                        <Button color="info" className="mt-4" onClick={() => migrateSubCategory(subCategoryMigrateSelected, subCategoryId)} block>Yes, migrate my Product on this SubCategory !</Button>
+                        <Button color="danger" className="mt-4" onClick={() => { deleteSubCategory(subCategoryId); setDeleteSubCategoryModal(false) }} block>No, delete everything</Button>
+                    </Modal.Body>
+                </Modal>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <div>
+                    {pageCount > 0 &&
+                        <ReactPaginate
+                            previousLabel={"prev"}
+                            nextLabel={"next"}
+                            breakLabel={"..."}
+                            breakClassName={"break-me"}
+                            pageCount={pageCount}
+                            marginPagesDisplayed={1}
+                            pageRangeDisplayed={2}
+                            onPageChange={handlePageClick}
+                            containerClassName={"pagination"}
+                            subContainerClassName={"pages pagination"}
+                            activeClassName={"active"} />}
+                </div>
             </div>
         </div>
 

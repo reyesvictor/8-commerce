@@ -1,0 +1,250 @@
+.triangle {
+width: 0;
+height: 0;
+border: 0 solid transparent;
+border-right-width: 37px;
+border-left-width: 230px;
+right: calc(50% - 120px);
+border-bottom: 125px solid rgba(0, 0, 0,.4);
+transform: rotate(-10deg);
+z-index: 0!important;
+position: absolute;
+}
+
+.card-wrap { 
+    display: table;
+     width: 350px;
+     margin: auto;
+     position: relative;
+ }
+
+.card { border-radius: 8px;
+     height: 200px;
+     position: relative;
+     color: #CCC;
+     font-family: 'Ubuntu Mono', monospace;
+     box-shadow: 0px 0px 4px 0px rgba(0,0,0,.2);
+     background: #004768;
+     background: -moz-linear-gradient(left,  #004768 0%, #00325b 100%);
+     background: -webkit-linear-gradient(left,  #004768 0%,#00325b 100%);
+     background: linear-gradient(to right,  #004768 0%,#00325b 100%);
+     /* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#004768', endColorstr='#00325b',GradientType=1 ); */
+ }
+.card-back { transform: rotateY(180deg);
+     opacity: 0;
+     position: absolute;
+     top: 0;
+     width: 100%;
+     height: 100%;
+ }
+.flag { width: 28%;
+     top: 0;
+     right: 0;
+     height: 70px;
+     position: absolute;
+     border-top-right-radius: 8px;
+ }
+.flag img { width: 100%;
+     height: auto;
+ }
+.label { font-size: 14px;
+     opacity: .7;
+     margin-bottom: 5px;
+ }
+.value { text-transform: uppercase;
+     font-size: 18px;
+ }
+.number { font-size: 24px;
+     line-height: 1;
+     position: absolute;
+     top: 80px;
+     left: 15px;
+ }
+.number span { margin-right: 10px;
+     display: inline-block;
+ }
+.owner-data { position: absolute;
+     bottom: 0;
+     left: 0;
+     width: 100%;
+     display: flex;
+     padding: 15px;
+     justify-content: space-between;
+     box-sizing: border-box;
+     border-radius: 0 0 8px 8px;
+ }
+.validate { text-align: center;
+ }
+
+
+/*-------------------------------*/
+
+.listUser {
+    margin: -1px;
+    padding: 15px;
+    border: 1px solid hsl(0, 0%, 83%);
+    background-color: hsl(0, 0%, 92%);
+}
+    
+.listUser:hover {
+    color: black;
+    cursor: pointer;
+    background-color: white;
+}
+
+
+.authUser {
+    margin: -1px;
+    padding: 15px;
+    border: 1px solid rgb(175, 175, 175);
+    color: rgb(255, 255, 255); 
+    background-color: #9e9e9e;
+}
+
+.StyleActive {
+    color: black;
+    background-color: white !important;
+}
+
+.a-none {
+    color: black;
+    text-transform: uppercase;
+    text-decoration: none !important;
+}
+
+.tableHistory {
+    border: 1px solid rgb(53, 76, 107);
+}
+
+.allHistory {
+    background-color: #011638;
+    color: white;
+}
+
+.titleHistory {
+    padding: 8px 15px 8px 5px;
+    border: 1px solid rgb(175, 175, 175) !important;
+}
+
+.showHistory {
+    cursor: pointer;
+}
+
+.AllOrders {
+    font-family: "Lato";
+    text-transform: uppercase;
+    font-weight: bold;
+}
+ 
+.h {
+    background-color: #e7dfc6;
+}
+
+.noOrder {
+    color: rgb(221, 190, 15);
+    transform: rotate(330deg);
+    position: absolute;
+    margin: 7%;
+    font-size: 109px;
+}
+
+/* ------ CSS USER-CARDS  ----- */
+.cards {
+    /* margin-right: 15% !important; */
+    margin: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    width: 310px;
+    height: 150px;
+    color: white;
+    background: linear-gradient(to bottom right, #0a234b, #011638);
+    display: grid;
+}
+
+.titleCard {
+    font-weight: bold;
+}
+
+.logocb {
+    float: right;
+    width: 100px;
+}
+
+.YourCards {
+    /* border: 1px solid rgb(175, 175, 175); */
+}
+
+.TitleCards {
+    /* background-color: #e7dfc6; */
+    /* text-transform: uppercase; */
+    text-align: center;
+    border-bottom: 1px solid rgb(175, 175, 175);
+    margin-bottom: 0px !important;
+}
+
+.divCard {
+    padding: 20px;
+    margin: -1px;
+    border-bottom: 1px solid rgb(175, 175, 175);
+}
+
+.cardDelete {
+    width: 150px;
+    height: 50px;
+}
+
+.colorblack {
+    background-color: black;
+    width: 61px;
+    height: 16px;
+    position: absolute;
+    margin-left: -18px;
+    margin-top: -12px;
+    border-radius: 35px 35px 0px 0px;
+}
+
+.pccv {
+    z-index: 400!important;
+    color: white;
+    background: #011638;
+    border-radius: 50%;
+    width: fit-content;
+    padding: 20px;
+    /* box-shadow: -10px 5px 2px black; */
+    border: 1px solid white;
+}
+
+.spanccv {
+    background-color: rgb(209, 209, 209);
+    box-shadow: 0px 0px 5px rgb(209, 209, 209);
+    color: black;
+}
+
+.cryptogramme {
+    margin-bottom: 0;
+    text-decoration: underline;
+}
+
+.addcard {
+    /* float: right; */
+    width: 20%;
+    padding: 11px !important;
+}
+
+.inputCard {
+    width: 100px !important;
+    margin-right: 5%;
+}
+
+.slash {
+    margin-left: -15px;
+    margin-right: 8px;
+}
+
+.sizemin {
+    font-size: 13px;
+}
+
+.positionCrypto {
+    float: right;
+}

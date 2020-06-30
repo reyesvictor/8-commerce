@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Category.css';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import '../UpdateCategory/node_modules/react-toastify/dist/ReactToastify.css';
 import store from '../../../store';
 
 function CreateCategory() {
@@ -10,17 +10,18 @@ function CreateCategory() {
     const [isReady, setIsReady] = useState(false);
     const [isInvalid, setIsInvalid] = useState(false);
 
-    const token = store.getState().auth.token
+    const token = store.getState().auth.token;
     const config = {
         headers: {
-                "Content-type": "application/json"
+                "Content-type": "application/json",
+                "Authorization": 'Bearer '+token
         }
     }
-    useEffect(() => {
-        if (token) {
-            config.headers['x-auth-token'] = token
-        }
-    }, [token]);
+    // useEffect(() => {
+    //     if (token) {
+    //         config.headers['Authorization'] = 'Bearer '+token;
+    //     }
+    // }, [token]);
 
     function handleChange(event) {
             let res = event.target.value.trim();
@@ -53,7 +54,7 @@ function CreateCategory() {
         if (isReady) {
             setIsReady(false);
             const body = JSON.stringify({ ...formControl });
-            axios.post("http://127.0.0.1:8000/api/category/create/" + formControl.category, body, config).then( res => {
+            axios.post(process.env.REACT_APP_API_LINK + "/api/category/create/" + formControl.category, body, config).then( res => {
                 toast.success('Category correctly added!', {position: "top-center"});
             }).catch( err => {
                 toast.error('Category already exist!', {position: 'top-center'});

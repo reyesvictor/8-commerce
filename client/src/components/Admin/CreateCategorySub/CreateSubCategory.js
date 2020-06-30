@@ -17,18 +17,19 @@ function CreateSubCategory() {
     const token = store.getState().auth.token
     const config = {
         headers: {
-            "Content-type": "application/json"
+            "Content-type": "application/json",
+            "Authorization": 'Bearer '+token
         }
     }
 
-    useEffect(() => {
-        if (token) {
-            config.headers['x-auth-token'] = token
-        }
-    }, [token]);
+    // useEffect(() => {
+    //     if (token) {
+    //         config.headers['Authorization'] = 'Bearer '+token;
+    //     }
+    // }, [token]);
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/api/category", config).then(e => {
+        axios.get(process.env.REACT_APP_API_LINK + "/api/category", config).then(e => {
             setAllCategory(e.data.data);
         });
     }, []);
@@ -76,7 +77,7 @@ function CreateSubCategory() {
         if (isReady) {
             setIsReady(false);
             const body = JSON.stringify({ ...formControl });
-            axios.post("http://127.0.0.1:8000/api/subcategory/create/" + categorySelected + "/" + formControl.subCategory, body, config)
+            axios.post(process.env.REACT_APP_API_LINK + "/api/subcategory/create/" + categorySelected + "/" + formControl.subCategory, body, config)
                 .then(res => {
                     toast.success('SubCategory correctly added!', { position: 'top-center' });
                 }).catch(err => {

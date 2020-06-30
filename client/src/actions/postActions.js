@@ -14,7 +14,7 @@ export const getSinglePost = id => dispatch => {
     //request info
     const body = JSON.stringify({ id })
 
-    axios.post('http://127.0.0.1:8000/api/posts/single', body, config)
+    axios.post(process.env.REACT_APP_API_LINK + '/api/posts/single', body, config)
         .then(res =>
             dispatch({
                 type: GET_POST,
@@ -25,7 +25,7 @@ export const getSinglePost = id => dispatch => {
 // get all posts
 export const getPosts = () => dispatch => {
     dispatch(setPostsLoading())
-    axios.get('http://127.0.0.1:8000/api/posts')
+    axios.get(process.env.REACT_APP_API_LINK + '/api/posts')
         .then(res =>
             dispatch({
                 type: GET_POSTS,
@@ -47,7 +47,7 @@ export const searchPost = searchValue => dispatch => {
     //request info
     const body = JSON.stringify({ searchValue })
 
-    axios.post('http://127.0.0.1:8000/api/posts/search', body, config)
+    axios.post(process.env.REACT_APP_API_LINK + '/api/posts/search', body, config)
         .then(res =>
             dispatch({
                 type: GET_POSTS,
@@ -69,7 +69,7 @@ export const getUserPosts = id => dispatch => {
     //request info
     const body = JSON.stringify({ id })
 
-    axios.post('http://127.0.0.1:8000/api/posts/user', body, config)
+    axios.post(process.env.REACT_APP_API_LINK + '/api/posts/user', body, config)
         .then(res =>
             dispatch({
                 type: GET_POSTS,
@@ -89,7 +89,7 @@ export const addPost = ({ title, date, content, creator }) => dispatch => {
     //request info
     const body = JSON.stringify({ title, date, content, creator })
 
-    axios.post('http://127.0.0.1:8000/api/posts/', body, config)
+    axios.post(process.env.REACT_APP_API_LINK + '/api/posts/', body, config)
         .then(res =>
             dispatch({
                 type: ADD_POST,
@@ -109,7 +109,7 @@ export const updatePost = ({ title, _id, content, date }) => dispatch => {
     //request info
     const body = JSON.stringify({ title, content, _id, date })
 
-    axios.post('http://127.0.0.1:8000/api/posts/update', body, config)
+    axios.post(process.env.REACT_APP_API_LINK + '/api/posts/update', body, config)
         .then(res =>
             dispatch({
                 type: UPDATE_POST,
@@ -119,7 +119,7 @@ export const updatePost = ({ title, _id, content, date }) => dispatch => {
 
 // no need to have = (title) => because there's only one
 export const deletePost = id => dispatch => {
-    axios.delete(`http://127.0.0.1:8000/api/posts/${id}`)
+    axios.delete(process.env.REACT_APP_API_LINK + `/api/posts/${id}`)
         .then(res =>
             dispatch({
                 type: DELETE_POST,
