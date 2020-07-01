@@ -33,7 +33,7 @@ function ShippingAddress({ idUser, config }) {
                     <td><p className="m-2 align-items-center">{data.firstname}</p></td>
                     <td><p className="m-2 align-items-center">{data.lastname}</p></td>
                     <td><button className="btn btn-outline-info m-1" onClick={async () => { await setAddressId(data.id); setShowUpdate(true) }}> Update </button></td>
-                    <td><button className="btn btn-outline-danger m-1" onClick={() => deleteAddress(data.id)}> Delete </button></td>
+                    {/* <td><button className="btn btn-outline-danger m-1" onClick={() => deleteAddress(data.id)}> Delete </button></td> */}
                 </tr>
             ) : null
             setAllShippingAddress(dataToGive)

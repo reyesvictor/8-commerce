@@ -58,13 +58,17 @@ export const register = ({ username, email, password }) => dispatch => {
     }
     //request info
     const body = JSON.stringify({ username, email, password })
+    console.log(body)
 
     axios.post(process.env.REACT_APP_API_LINK + '/register', body, config)
-        .then(res => dispatch({
+        .then(res => {
+            console.log(res)
+            dispatch({
             type: REGISTER_SUCCESS,
             payload: res.data
-        }))
+        })})
         .catch(err => {
+            console.log(err)
             dispatch(returnErrors(err.response.data, err.response.status, 'REGISTER_FAIL'))
             dispatch({
                 type: REGISTER_FAIL

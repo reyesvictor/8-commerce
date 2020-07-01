@@ -120,36 +120,24 @@ class IndexNavbar extends Component {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <NavItem>
               {/* <Nav.Link href="/search?sexe=H">Men</Nav.Link> */}
-              <Link to="/search?sexe=H">Men</Link>
-            </NavItem>
-            <NavItem>
+              <NavLink to="/search?sexe=H">Men</NavLink>
               {/* <Nav.Link href="/search?sexe=F">Women</Nav.Link> */}
               {/* <Link to="/search?sexe=F">Women</Link> */}
-            </NavItem>
-            <NavItem>
               {/* <Nav.Link href="/search?category=Accessories">Accessories</Nav.Link> */}
-              <Link to="/search?category=Accessories">Accessories</Link>
-            </NavItem>
-            <NavItem>
+              <NavLink to="/search?category=Accessories">Accessories</NavLink>
               {/* <Nav.Link href="/search?category=Accessories">Accessories</Nav.Link> */}
-              <Link to="/techlab">Techlab</Link>
-            </NavItem>
+              <NavLink to="/techlab">Techlab</NavLink>
           </Navbar.Collapse>
         </Navbar>
         <Navbar id="underline">
           <SuggestionSearch />
-          <Nav.Link id="searchLogo">
-            <Link to="/search"><img src={searchLogo} /></Link>
-          </Nav.Link>
+            <Link to="/search" id="searchLogo"><img src={searchLogo} /></Link>
           <Nav>
             {!isLoading ? (isAuthenticated ? authLinks : guestLinks) : null}
           </Nav>
           {user !== null && user.role.includes('ROLE_ADMIN') ? (
-            <Nav.Link id="adminLogo">
-              <Link to="/admin"><img src={adminLogo} /></Link>
-            </Nav.Link>
+              <Link to="/admin" id="adminLogo"><img src={adminLogo} /></Link>
           ) : null}
           <div
             className="p-0"

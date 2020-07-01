@@ -5,6 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import ReactPaginate from 'react-paginate';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import store from '../../../store';
 
 const Reviews = () => {
     const [postDataPromos, setPostDataPromos] = useState([]);
@@ -15,9 +16,11 @@ const Reviews = () => {
     const [deleteCodeModal, setDeleteCodeModal] = useState(false);
     const [reviewToDelete, setReviewToDelete] = useState(null);
     const [reviewsReady, setReviewsReady] = useState(false);
+    const token = store.getState().auth.token
     const config = {
         headers: {
-            "Content-type": "application/json"
+            "Content-type": "application/json",
+            "Authorization": 'Bearer ' + token
         }
     }
 
@@ -74,7 +77,7 @@ const Reviews = () => {
 
     const deleteReview = (e) => {
         axios
-            .delete(process.env.REACT_APP_API_LINK + '/api/review/' + reviewToDelete)
+            .delete(process.env.REACT_APP_API_LINK + '/api/review/' + reviewToDelete, config)
             .then(async e => {
                 toast.success('Review correctly deleted!', { position: "top-center" });
                 setReviewToDelete(null)
