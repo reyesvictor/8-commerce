@@ -1,5 +1,6 @@
-Projet e-commerce fait par le 8 brillants développeurs dans le cadre de la formation Samsung Campus.
-#1 Victoire Marketing descerné par l'ESSEC Business School.
+Projet e-commerce fait par le 8 brillants développeurs. \
+Dans le cadre de la formation Samsung Campus. \
+#1 Victoire Marketing descerné par l'ESSEC Business School. \
 Langages: Reactjs, Redux et Symfony.
 
 Audrey Claris:
