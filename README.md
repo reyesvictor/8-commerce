@@ -27,7 +27,7 @@ Hakim Nemar:
 - https://www.linkedin.com/in/hakim-nemar/
 - https://github.com/HakimNemar
 
-Nordine el-Bakaoui:
+Nordine el-Barkaoui:
 - https://www.linkedin.com/in/nordine-el-barkaoui-90ab291a6/
 - https://github.com/Elbarkaoui-Nordine
 
