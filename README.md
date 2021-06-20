@@ -1,6 +1,8 @@
-Projet e-commerce fait par le 8 brillants développeurs, projet en live ici: 🔗 https://e-8commerce-client.herokuapp.com/ \
-Dans le cadre de la formation Samsung Campus EPITECH. \
+Projet de site factice e-commerce fait par le 8 brillants développeurs dans le cadre de la formation Samsung Campus EPITECH. \
+
+Projet publié ici: 🔗 https://e-8commerce-client.herokuapp.com/ \
 #1 Victoire Marketing descerné par l'ESSEC Business School: https://www.linkedin.com/feed/update/urn:li:activity:6685934491401256960/ \
+
 Langages: Reactjs, Redux et Symfony.
 
 Audrey Claris:
